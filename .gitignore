@@ -1,0 +1,13 @@
+*.http
+*.swp
+*_override.tf
+.DS_Store
+.eslintcache
+coverage
+dist
+docker-compose-volumes
+node_modules
+npm-debug.log*
+tmp
+yarn-debug.log*
+yarn-error.log*
