@@ -169,8 +169,8 @@ const typeGen = async () => {
 
   const tsString = allTypes.join("\n\n");
   const sdlString = [...allSdls, "`"].join("\n\n");
-  fs.writeFileSync("./mongoDocTypes.ts", tsString);
-  fs.writeFileSync("./mongoDocSdls.ts", sdlString);
+  fs.writeFileSync("./examples/mongoDocTypes.ts", tsString);
+  fs.writeFileSync("./examples/mongoDocSdls.ts", sdlString);
   console.info("✅ Mongo Schema types generated!");
 };
 
