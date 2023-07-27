@@ -1,0 +1,7 @@
+awcache
+coverage
+dist
+bin
+docker-compose-volumes
+node_modules
+package-lock.json

@@ -1,38 +1,42 @@
-import { watch } from "chokidar";
-import fs from "fs";
-import { glob } from "glob";
-import path from "path";
+import fs from 'fs';
+import { JSONSchema4 } from 'json-schema';
+import * as ts from 'typescript';
+
+import getFullPaths from './getFullPaths';
+import singularize from './singularize';
+import watchDirs from './watchDirs';
+import writeFileAsync from './writeFileAsync';
 
 const typeMapping: Record<string, string> = {
-  string: "string",
-  bool: "boolean",
-  date: "Date",
-  double: "number",
-  int: "number",
-  objectId: "ObjectId",
+  bool: 'boolean',
+  date: 'Date',
+  double: 'number',
+  int: 'number',
+  objectId: 'ObjectId | string',
+  string: 'string',
 };
 
 const sdlMapping: Record<string, string> = {
-  string: "String",
-  bool: "Boolean",
-  date: "Date",
-  double: "Float",
-  int: "Int",
-  objectId: "ObjectId",
+  bool: 'Boolean',
+  date: 'Date',
+  double: 'Float',
+  int: 'Int',
+  objectId: 'ObjectId',
+  string: 'String',
 };
 
 // tab   &#9
 
-const reducer = ({
-  obj,
-  allTypes = [],
+const reduce = ({
   allSdls = [],
-  title,
+  allTypes = [],
+  collectionName,
+  obj,
 }: {
-  obj: any;
-  allTypes: string[];
   allSdls: string[];
-  title: string;
+  allTypes: string[];
+  collectionName: string;
+  obj: Record<string, JSONSchema4>;
 }) => {
   const { properties, required = [] } = obj;
   const typeResult: string[] = [];
@@ -46,48 +50,49 @@ const reducer = ({
     const sdlKey = k;
 
     const properK = k.charAt(0).toUpperCase() + k.slice(1);
-    const childType = `${title}${properK}`;
+    const childType = `${collectionName}${properK}`;
 
     if (value.enum) {
       const enumType = [
         `export enum ${childType}Enum {`,
-        ...value.enum.map((v: string) => `  ${v} = '${v}',`),
-        `}`,
-      ].join("\n");
+        ...value.enum.sort().map((v: string) => `  ${v} = '${v}',`),
+        '}',
+      ].join('\n');
       allTypes.push(enumType);
 
-      const enumSdl = [
-        `enum ${childType}Enum {`,
-        ...value.enum.map((v: string) => `  ${v}`),
-        `}`,
-      ].join("\n");
+      const enumSdl = [`   enum ${childType}Enum {`, ...value.enum.map((v: string) => `    ${v}`), '  }'].join('\n');
       allSdls.push(enumSdl);
       continue;
     }
 
-    if (typeof value.bsonType === "string") {
-      if (value.bsonType === "array") {
-        typeResult.push(`  ${typeKey}: ${childType}[];`);
-        sdlResult.push(
-          `  ${sdlKey}: [${childType}${isKeyRequired ? "!" : ""}]`
-        );
-        reducer({
-          obj: value.items,
-          allTypes,
-          allSdls,
-          title: childType,
-        });
+    if (typeof value.bsonType === 'string') {
+      if (value.bsonType === 'array') {
+        const mappedItemType = typeMapping[value.items.bsonType];
+        const itemTypeValue = mappedItemType ? mappedItemType : childType;
+        const mappedItemSdl = sdlMapping[value.items.bsonType];
+        const itemSdlValue = mappedItemSdl ? mappedItemSdl : childType;
+        typeResult.push(`  ${typeKey}: ${itemTypeValue}[];`);
+        sdlResult.push(`    ${sdlKey}: [${itemSdlValue}${isKeyRequired ? '!' : ''}]`);
+        if (!mappedItemType) {
+          reduce({
+            allSdls,
+            allTypes,
+            collectionName: childType,
+            obj: value.items,
+          });
+        }
+
         continue;
       }
 
-      if (value.bsonType === "object") {
+      if (value.bsonType === 'object') {
         typeResult.push(`  ${typeKey}: ${childType};`);
-        sdlResult.push(`  ${sdlKey}: ${childType}${isKeyRequired ? "!" : ""}`);
-        reducer({
-          obj: value,
-          allTypes,
+        sdlResult.push(`    ${sdlKey}: ${childType}${isKeyRequired ? '!' : ''}`);
+        reduce({
           allSdls,
-          title: childType,
+          allTypes,
+          collectionName: childType,
+          obj: value,
         });
         continue;
       }
@@ -101,111 +106,92 @@ const reducer = ({
         }
 
         if (mappedSdlValue) {
-          sdlResult.push(
-            `  ${sdlKey}: ${mappedSdlValue}${isKeyRequired ? "!" : ""}`
-          );
+          sdlResult.push(`    ${sdlKey}: ${mappedSdlValue}${isKeyRequired ? '!' : ''}`);
         }
         continue;
       }
     }
 
     if (Array.isArray(value.bsonType)) {
-      const valid = value.bsonType.includes("null");
+      const valid = value.bsonType.includes('null') || value.bsonType.length === 1;
       if (!valid) {
-        throw Error(
-          `Only one bsonType and null are supported for a bsonType array`
-        );
+        throw Error('Only one bsonType and null are supported for a bsonType array');
       }
       // handle Typescript
       const res: string[] = [];
       value.bsonType.forEach((v: string) => {
         const mapped = typeMapping[v];
-        if (v === "null") {
-          res.push("null");
+        if (v === 'null') {
+          res.push('null');
         } else if (mapped) {
           res.push(mapped);
         }
       });
-      typeResult.push(`  ${typeKey}: ${res.join(" | ")};`);
+      typeResult.push(`  ${typeKey}: ${res.join(' | ')};`);
 
       // handle SDL
-      const singleType = value.bsonType.filter((v: string) => v !== "null");
-      sdlResult.push(
-        `  ${sdlKey}: ${sdlMapping[singleType[0]]}${isKeyRequired ? "!" : ""}`
-      );
+      const singleType = value.bsonType.filter((v: string) => v !== 'null');
+      sdlResult.push(`    ${sdlKey}: ${sdlMapping[singleType[0]]}${isKeyRequired ? '!' : ''}`);
     }
   }
 
-  allTypes.push([`export type ${title} = {`, ...typeResult, "};"].join("\n"));
-  allSdls.push([`type ${title} {`, ...sdlResult, "}"].join("\n"));
+  allTypes.push([`export type ${collectionName} = {`, ...typeResult, '};'].join('\n'));
+  allSdls.push([`  type ${collectionName} {`, ...sdlResult, '  }'].join('\n'));
 };
 
-const abosolutePath = path.resolve(__dirname, "..", "**/mongoSchema.ts");
-const filePattern = `**/mongoSchema.ts`;
+const genTypes = async ({ outputPath, validatorPaths }: { outputPath: string; validatorPaths: string[] }) => {
+  const banner = '/* This file was generated by mongo-type-gen.  Do not edit */';
+  const allTypes: string[] = [banner, "import { ObjectId } from 'mongodb';"];
+  const allSdls: string[] = [banner, "import { gql } from 'graphql-tag';", 'export default gql`'];
 
-const files = glob.sync(abosolutePath);
-
-console.log("files", files);
-const typeGen = async () => {
-  const banner = "/* This file was generated by mongo-type-gen */";
-  const allTypes: string[] = [banner, `import { ObjectId } from 'mongodb';`];
-  const allSdls: string[] = [
-    banner,
-    `import { gql } from 'graphql-tag';`,
-    "export default gql`",
-  ];
-
-  for (const file of files) {
-    const imported = await import(file);
-    const schema = imported.default;
-    const jsonSchema = schema.$jsonSchema;
-    reducer({
-      obj: jsonSchema,
-      title: jsonSchema.title,
-      allTypes,
+  for (const path of validatorPaths) {
+    const validatorStr = fs.readFileSync(path, 'utf8');
+    const validator = ts.transpile(validatorStr);
+    const v = eval(validator);
+    const cName = path.split('/').pop()?.split('.')[0] || '';
+    const properCname = cName.charAt(0).toUpperCase() + cName.slice(1);
+    const singularCname = singularize(properCname);
+    reduce({
       allSdls,
+      allTypes,
+      collectionName: `${singularCname}Doc`,
+      obj: v.$jsonSchema,
     });
   }
 
-  const tsString = allTypes.join("\n\n");
-  const sdlString = [...allSdls, "`"].join("\n\n");
-  fs.writeFileSync("./examples/mongoDocTypes.ts", tsString);
-  fs.writeFileSync("./examples/mongoDocSdls.ts", sdlString);
-  console.info("✅ Mongo Schema types generated!");
+  const tsString = allTypes.join('\n\n');
+  const sdlString = [...allSdls, '`;'].join('\n\n');
+
+  await Promise.all([
+    writeFileAsync(`./${outputPath}/mongo.types.ts`, tsString),
+    writeFileAsync(`./${outputPath}/mongo.sdls.ts`, sdlString),
+  ]);
+
+  console.info('✅ Mongo Schema types generated!');
 };
 
-typeGen();
+const run = async () => {
+  const configPath = await getFullPaths('**/mongo-type-gen.config.ts');
+  const configFile = await import(configPath[0]);
 
-// let isInitial = true;
-// const run = async () => {
-//   console.log("WATCHED files ", filePattern, files);
-//   if (isInitial) {
-//     isInitial = false;
-//     await generateDocTypesFromSchemas();
-//   }
+  const validatorPaths = await getFullPaths('**/*.validator.ts');
 
-//   if (process.argv.includes("--watch")) {
-//     const watcher = watch(filePattern);
+  if (process.argv.includes('--watch') || process.argv.includes('-w')) {
+    const onChange = async () =>
+      genTypes({
+        outputPath: configFile.default.output,
+        validatorPaths,
+      });
+    watchDirs({
+      dirs: validatorPaths,
+      onChange,
+    });
+  }
 
-//     watcher.on("change", async (path, stats) => {
-//       console.log(
-//         `generateDocTypesFromSchemas change ${JSON.stringify(
-//           { path, stats },
-//           null,
-//           2
-//         )}`
-//       );
-//       await generateDocTypesFromSchemas();
-//     });
-//     process.once("SIGINT", async () => {
-//       console.log("generateDocTypesFromSchemas SIGINT");
-//       await watcher.close();
-//     });
-//     process.once("SIGTERM", async () => {
-//       console.log("generateDocTypesFromSchemas SIGTERM");
-//       await watcher.close();
-//     });
-//   }
-// };
+  genTypes({
+    outputPath: configFile.default.output,
+    validatorPaths,
+  });
+};
 
-// run();
+run();
