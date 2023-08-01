@@ -1,29 +1,24 @@
 {
-  "name": "mongo-type-gen",
-  "version": "1.0.0",
-  "description": "A type and sdl generator for MongoDB",
-  "main": "type-gen.js",
-  "bin": {
-    "mongo-type-gen": "bin/type-gen.js"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "gen-validators": "ts-node ./src/genValidators.ts",
-    "mod-validators": "ts-node ./src/modValidators.ts",
-    "gen-types": "ts-node ./src/genTypes.ts -w",
-    "type-gen:build": "node ./bin/type-gen.js -w",
-    "build": "rm -rf bin && node esbuild.mjs",
-    "testing": "ts-node-dev ./src/testing.ts",
-    "docker:down": "docker-compose -f docker-compose.local.yml down --remove-orphans",
-    "docker:up": "docker-compose -f docker-compose.local.yml up -d"
-  },
-  "keywords": [
-    "GraphQL",
-    "Mongo",
-    "Typescript"
-  ],
   "author": "paul@savignano.io",
-  "license": "ISC",
+  "bin": {
+    "mtg": "bin/genTypes.js",
+    "mtg-gen-types": "bin/genTypes.js",
+    "mtg-gen-validators": "bin/genValidators.js",
+    "mtg-add-validators": "bin/addValidators.js"
+  },
+  "bugs": {
+    "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"
+  },
+  "dependencies": {
+    "fast-glob": "^3.3.0",
+    "fs": "^0.0.1-security",
+    "glob": "^10.3.3",
+    "graphql-tag": "^2.12.6",
+    "json-schema": "^0.4.0",
+    "mongodb": "^5.7.0",
+    "typescript": "^5.1.6"
+  },
+  "description": "A type and sdl generator for MongoDB",
   "devDependencies": {
     "@types/node": "^20.4.2",
     "@typescript-eslint/eslint-plugin": "^6.1.0",
@@ -39,28 +34,45 @@
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "eslint-plugin-typescript-sort-keys": "^2.3.0",
     "prettier": "^3.0.0",
-    "ts-node": "^10.9.1",
-    "ts-node-dev": "^2.0.0"
-  },
-  "dependencies": {
-    "fast-glob": "^3.3.0",
-    "fs": "^0.0.1-security",
-    "glob": "^10.3.3",
-    "graphql-tag": "^2.12.6",
-    "json-schema": "^0.4.0",
-    "mongodb": "^5.7.0",
-    "typescript": "^5.1.6"
+    "ts-node": "^10.9.1"
   },
   "directories": {
     "example": "examples",
     "lib": "lib"
   },
+  "files": [
+    "bin",
+    "LICENSE"
+  ],
+  "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme",
+  "keywords": [
+    "GraphQL",
+    "Mongo",
+    "Typescript"
+  ],
+  "license": "ISC",
+  "main": "mongo-type-gen.js",
+  "name": "mongo-type-gen",
+  "peerDependencies": {
+    "graphql-tag": "^2.0.0",
+    "mongodb": "^5.0.0",
+    "typescript": "^5.0.0"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PaulSavignano/mongo-type-gen.git"
   },
-  "bugs": {
-    "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"
+  "scripts": {
+    "add-validators": "ts-node ./src/addValidators.ts",
+    "build": "rm -rf bin && node esbuild.mjs",
+    "docker:down": "docker-compose -f docker-compose.local.yml down --remove-orphans",
+    "docker:up": "docker-compose -f docker-compose.local.yml up -d",
+    "gen-types": "ts-node ./src/genTypes.ts -w",
+    "gen-types:build": "node ./bin/genTypes.js",
+    "gen-validators": "ts-node ./src/genValidators.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "testing": "ts-node-dev ./src/testing.ts",
+    "type-gen:build": "node ./bin/type-gen.js -w"
   },
-  "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme"
+  "version": "1.0.1"
 }

@@ -1,9 +1,9 @@
 import fs from 'fs';
 
-import pkg from '../package.json';
+import pkg from '../../package.json';
 
 function watchDirs({ dirs, onChange }: { dirs: string[]; onChange: () => Promise<void> }) {
-  console.log(`✅ ${pkg.name} watching: ${dirs.join(', ')}`);
+  console.info(`✅ ${pkg.name} watching: ${dirs.join(', ')}`);
 
   let isChanging = false;
   dirs.forEach((dir) => {
