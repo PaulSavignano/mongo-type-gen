@@ -22,13 +22,12 @@ jobs:
           npm run build
       - name: Set Version
         run: |
+          set -xe
           tag=${{ github.event.release.tag_name }}
           version=${tag#"v"}
           echo "Release Version: $version"
           sed -i "s/\"version\": \".*\"/\"version\": \"${version}\"/" package.json
           git switch main
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
           git commit -am "ci: update package.json version to ${version}"
           git push origin main
       - name: Publish
