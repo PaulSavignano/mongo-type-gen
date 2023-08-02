@@ -8,25 +8,25 @@ function watchDirs({ dirs, onChange }: { dirs: string[]; onChange: () => Promise
   let isChanging = false;
   dirs.forEach((dir) => {
     const watcher = fs.watch(dir, { recursive: true });
-    watcher.on('change', (eventType, filename) => {
+    watcher.on('change', (_eventType, filename) => {
       if (!isChanging) {
         isChanging = true;
         onChange();
         if (filename) {
           setTimeout(() => {
             isChanging = false;
-          }, 500);
+          }, 2000);
         }
       }
     });
 
     watcher.on('error', (error) => {
-      console.error(`Watcher error: ${error}`);
+      console.error(`watchDirs error: ${error}`);
     });
 
     // Event listener for 'close' event (optional)
     watcher.on('close', () => {
-      console.log('Watcher closed');
+      console.log('watchDirs closed');
     });
   });
 }

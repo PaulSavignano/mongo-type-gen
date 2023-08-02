@@ -10,11 +10,28 @@ export default gql`
     year: Int!
   }
 
+  type UserDocAddressChildren {
+    _id: ObjectId!
+    age: Int!
+    createdAt: Date!
+    name: String!
+    updatedAt: Date
+  }
+
   type UserDocAddress {
+    children: [UserDocAddressChildren]
     city: String!
     state: String!
     street: String!
     zip: String!
+  }
+
+  type UserDocChildrenSiblings {
+    _id: ObjectId!
+    age: Int!
+    createdAt: Date!
+    name: String!
+    updatedAt: Date
   }
 
   type UserDocChildren {
@@ -22,7 +39,7 @@ export default gql`
     age: Int!
     createdAt: Date!
     name: String!
-    updatedAt: Date
+    siblings: [UserDocChildrenSiblings]
   }
 
    enum UserDocGenderEnum {

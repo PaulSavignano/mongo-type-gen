@@ -53,6 +53,9 @@
   "license": "ISC",
   "main": "mongo-type-gen.js",
   "name": "mongo-type-gen",
+  "engines": {
+    "node": ">=18.13.0"
+  },
   "peerDependencies": {
     "graphql-tag": "^2.0.0",
     "mongodb": "^5.0.0",
@@ -65,14 +68,20 @@
   "scripts": {
     "add-validators": "ts-node ./src/addValidators.ts",
     "build": "rm -rf bin && node esbuild.mjs",
+    "checks:ci": "npm run format && npm run lint && npm run typecheck && npm run build",
     "docker:down": "docker-compose -f docker-compose.local.yml down --remove-orphans",
     "docker:up": "docker-compose -f docker-compose.local.yml up -d",
+    "format": "prettier --list-different '**/*.{css,js,jsx,ts,tsx,json,htm,html,yml,yaml}'",
+    "format:fix": "prettier --write '**/*.{css,js,jsx,ts,tsx,json,htm,html,yml,yaml}'",
     "gen-types": "ts-node ./src/genTypes.ts -w",
     "gen-types:build": "node ./bin/genTypes.js",
     "gen-validators": "ts-node ./src/genValidators.ts",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "testing": "ts-node-dev ./src/testing.ts",
-    "type-gen:build": "node ./bin/type-gen.js -w"
+    "type-gen:build": "node ./bin/type-gen.js -w",
+    "typecheck": "tsc --project . --noEmit"
   },
   "version": "1.0.1"
 }

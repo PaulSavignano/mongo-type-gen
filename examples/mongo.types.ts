@@ -8,11 +8,28 @@ export type StudentDoc = {
   year: number;
 };
 
+export type UserDocAddressChildren = {
+  _id: ObjectId | string;
+  age: number | null;
+  createdAt: Date;
+  name: string;
+  updatedAt?: Date;
+};
+
 export type UserDocAddress = {
+  children?: UserDocAddressChildren[];
   city: string;
   state: string;
   street: string;
   zip: string;
+};
+
+export type UserDocChildrenSiblings = {
+  _id: ObjectId | string;
+  age: number | null;
+  createdAt: Date;
+  name: string;
+  updatedAt?: Date;
 };
 
 export type UserDocChildren = {
@@ -20,7 +37,7 @@ export type UserDocChildren = {
   age: number | null;
   createdAt: Date;
   name: string;
-  updatedAt?: Date;
+  siblings?: UserDocChildrenSiblings[];
 };
 
 export enum UserDocGenderEnum {

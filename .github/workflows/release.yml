@@ -1,0 +1,35 @@
+name: release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version-file: 'package.json'
+      - name: Checks
+        run: |
+          set -xe
+          npm ci
+          npm run checks:ci
+      - name: Build
+        run: |
+          npm run build
+      - name: Set Version
+        run: |
+          tag=${{ github.event.release.tag_name }}
+          version=${release_version#"v"}
+          echo "Release Version: $version"
+          sed -i "s/\"version\": \".*\"/\"version\": \"${version}\"/" package.json
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git commit -am "ci: update package.json version to ${version}"
+          git push origin main
+      - name: Publish
+        run: |
+          npm publish
