@@ -1,7 +1,31 @@
 <h1 align="center">mongo-type-gen</h1>
 
-<h3>TODO - This package is a work in progress</h3>
-<ul>
-  <li>Test</li>
-  <li>Build for prod</li>
-</ul>
+<div align="center" dir="auto">
+	<img 
+		alt="main"
+		src="https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/pr.yml/badge.svg"
+	/>
+</div>
+
+## Table of Contents
+
+- [Usage](#usage)
+
+## Usage
+
+Add run scripts to package.json
+
+```json
+{
+  "scripts": {
+    "gen-types": "mtg",
+    "gen-validators": "mtg-gen-validators",
+    "add-validators": "mtg-add-validators",
+    "start": "ts-node-dev ./src/index.ts & npm run mtg"
+  }
+}
+```
+
+```bash
+1.  npm run start
+```
