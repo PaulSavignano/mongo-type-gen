@@ -15,7 +15,7 @@ jobs:
       - name: Checks
         run: |
           set -xe
-          npm ci
+          npm ci --force
           npm run checks:ci
       - name: Build
         run: |
