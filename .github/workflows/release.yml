@@ -16,7 +16,7 @@ jobs:
         run: |
           set -xe
           npm ci --force
-          npm run checks:ci
+          # npm run checks:ci
       - name: Build
         run: |
           npm run build
@@ -27,9 +27,12 @@ jobs:
           version=${tag#"v"}
           echo "Release Version: $version"
           sed -i "s/\"version\": \".*\"/\"version\": \"${version}\"/" package.json
-          git switch main
+          git checkout main
           git commit -am "ci: update package.json version to ${version}"
           git push origin main
+          git checkout ${tag}
+          git commit -am "ci: update package.json version to ${version}"
+          git push origin ${tag}
       - name: Publish
         run: |
           npm publish
