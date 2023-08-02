@@ -23,11 +23,12 @@ jobs:
       - name: Set Version
         run: |
           tag=${{ github.event.release.tag_name }}
-          version=${release_version#"v"}
+          version=${tag#"v"}
           echo "Release Version: $version"
           sed -i "s/\"version\": \".*\"/\"version\": \"${version}\"/" package.json
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
+          git pull origin main
           git commit -am "ci: update package.json version to ${version}"
           git push origin main
       - name: Publish
