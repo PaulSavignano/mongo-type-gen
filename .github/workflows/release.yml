@@ -26,9 +26,9 @@ jobs:
           version=${tag#"v"}
           echo "Release Version: $version"
           sed -i "s/\"version\": \".*\"/\"version\": \"${version}\"/" package.json
+          git switch main
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git pull origin main
           git commit -am "ci: update package.json version to ${version}"
           git push origin main
       - name: Publish
