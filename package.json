@@ -83,5 +83,5 @@
     "type-gen:build": "node ./bin/type-gen.js -w",
     "typecheck": "tsc --project . --noEmit"
   },
-  "version": "1.0.1"
+  "version": ""
 }
