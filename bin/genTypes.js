@@ -43,7 +43,7 @@ var getFullPaths_default = getFullPaths;
 var import_package = __toESM(require("../package.json"));
 var getConfig = async () => {
   const configPaths = await getFullPaths_default(["**/mtg.config.*s", "**/mongo-type-gen.config.*s"]);
-  if (configPaths.length > 0) {
+  if (configPaths.length > 1) {
     throw Error(
       `\u274C ${import_package.default.name} found multiple config files: 
 ${configPaths.join("\n")}
@@ -82,22 +82,22 @@ function watchDirs({ dirs, onChange }) {
   let isChanging = false;
   dirs.forEach((dir) => {
     const watcher = import_fs.default.watch(dir, { recursive: true });
-    watcher.on("change", (eventType, filename) => {
+    watcher.on("change", (_eventType, filename) => {
       if (!isChanging) {
         isChanging = true;
         onChange();
         if (filename) {
           setTimeout(() => {
             isChanging = false;
-          }, 500);
+          }, 2e3);
         }
       }
     });
     watcher.on("error", (error) => {
-      console.error(`Watcher error: ${error}`);
+      console.error(`watchDirs error: ${error}`);
     });
     watcher.on("close", () => {
-      console.log("Watcher closed");
+      console.log("watchDirs closed");
     });
   });
 }
