@@ -19,6 +19,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version-file: 'package.json'
+          registry-url: 'https://registry.npmjs.org'
       - name: Checks
         run: |
           set -xe
@@ -31,7 +32,7 @@ jobs:
         id: version
         run: |
           set -xe
-          tag=${{github.event.release.tag_name}}
+          tag=${{ github.event.release.tag_name }}
           version=${tag#"v"}
           echo "version=${version}" >> $GITHUB_OUTPUT
       - name: Update package.json
@@ -43,5 +44,7 @@ jobs:
           git commit -am "ci: update package.json version to ${{ steps.version.outputs.version }}"
           git push origin main
       - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           npm publish
