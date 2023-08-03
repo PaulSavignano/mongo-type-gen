@@ -35,6 +35,8 @@ jobs:
         run: |
           set -xe
           sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.version.outputs.version }}\"/" package.json
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
           git commit -am "ci: update package.json version to ${{ steps.version.outputs.version }}"
           git push origin main
       - name: Publish
