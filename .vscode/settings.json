@@ -1,7 +1,16 @@
 {
+  "[dockercompose]": { "editor.autoIndent": "advanced" },
   "[json]": { "editor.defaultFormatter": "vscode.json-language-features" },
   "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-  "[yaml]": { "editor.insertSpaces": true, "editor.tabSize": 2, "editor.autoIndent": "none" },
+  "[yaml]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced",
+    "editor.formatOnSave": true
+  },
+  "[yaml.github-actions]": {
+    "editor.formatOnSave": true
+  },
   "editor.autoClosingBrackets": "always",
   "editor.bracketPairColorization.enabled": true,
   "editor.codeActionsOnSave": { "source.fixAll": true, "source.fixAll.eslint": true },
@@ -20,5 +29,9 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.workspaceSymbols.scope": "currentProject",
   "window.zoomLevel": 0,
-  "yaml.schemas": { "https://json.schemastore.org/github-workflow": "/.github/workflows/**/*.yml" }
+  "yaml.schemas": {
+    "https://json.schemastore.org/github-workflow": "/.github/workflows/**/*.yml",
+    "https://json.schemastore.org/github-workflow.json": ["*.github/workflows/*.yaml", "*.github/workflows/*.yml"],
+    "https://json.schemastore.org/github-action.json": ["action.yaml", "action.yml"]
+  }
 }

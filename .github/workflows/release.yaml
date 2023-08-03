@@ -3,12 +3,16 @@ name: release
 on:
   release:
     types: [published]
+  pull_request:
+    branches: [main]
 
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: main
       - uses: actions/setup-node@v3
         with:
           node-version-file: 'package.json'
@@ -20,19 +24,19 @@ jobs:
       - name: Build
         run: |
           npm run build
-      - name: Set Version
+      - name: Get Version
+        id: version
         run: |
           set -xe
-          tag=${{ github.event.release.tag_name }}
+          tag=${{github.event.release.tag_name}}
           version=${tag#"v"}
-          echo "Release Version: $version"
-          sed -i "s/\"version\": \".*\"/\"version\": \"${version}\"/" package.json
-          git checkout main
-          git commit -am "ci: update package.json version to ${version}"
+          echo "version=${version}" >> $GITHUB_OUTPUT
+      - name: Update package.json
+        run: |
+          set -xe
+          sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.version.outputs.version }}\"/" package.json
+          git commit -am "ci: update package.json version to ${{ steps.version.outputs.version }}"
           git push origin main
-          git checkout ${tag}
-          git commit -am "ci: update package.json version to ${version}"
-          git push origin ${tag}
       - name: Publish
         run: |
           npm publish
