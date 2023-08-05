@@ -23,28 +23,28 @@ const banner = {
 
 const runBuild = async () => {
   try {
-    const getTypes = build({
+    const buildGenTypes = build({
       ...defaultOptions,
       banner,
       entryPoints: ['src/genTypes.ts'],
       external,
       outfile: 'bin/genTypes.js',
     });
-    const getValidators = build({
+    const buildDownloadValidators = build({
       ...defaultOptions,
       banner,
-      entryPoints: ['src/genValidators.ts'],
+      entryPoints: ['src/downloadValidators.ts'],
       external,
-      outfile: 'bin/genValidators.js',
+      outfile: 'bin/downloadValidators.js',
     });
-    const updateValidators = build({
+    const buildUploadValidators = build({
       ...defaultOptions,
       banner,
-      entryPoints: ['src/addValidators.ts'],
+      entryPoints: ['src/uploadValidators.ts'],
       external,
-      outfile: 'bin/addValidators.js',
+      outfile: 'bin/uploadValidators.js',
     });
-    await Promise.all([getTypes, getValidators, updateValidators]);
+    await Promise.all([buildGenTypes, buildDownloadValidators, buildUploadValidators]);
     console.info('✅ esbuild completed!');
   } catch (e) {
     console.info('❌ esbuild failed', e);

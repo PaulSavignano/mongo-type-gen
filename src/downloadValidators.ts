@@ -9,7 +9,7 @@ import pkg from '../package.json';
 // Replace the uri string with your MongoDB deployment's connection string.
 let client: MongoClient;
 
-async function genValidators(): Promise<void> {
+export async function downloadValidators(): Promise<void> {
   try {
     const config = await getConfig();
     const files = [];
@@ -31,9 +31,11 @@ async function genValidators(): Promise<void> {
     }
 
     await Promise.all(files);
-    console.info(`✅ ${pkg.name} validators generated!`);
+    console.info(`✅ ${pkg.name} validators downloaded from Mongo!`);
   } finally {
     await client.close();
   }
 }
-genValidators().catch(console.error);
+downloadValidators().catch((e) => {
+  console.error('❌ downloadValidators failed: ', e);
+});

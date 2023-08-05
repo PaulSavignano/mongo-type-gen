@@ -7,6 +7,7 @@ import getFullPaths from './common/getFullPaths';
 import singularize from './common/singularize';
 import watchDirs from './common/watchDirs';
 import writeFileAsync from './common/writeFileAsync';
+import { downloadValidators } from './downloadValidators';
 import pkg from '../package.json';
 
 const typeMapping: Record<string, string> = {
@@ -147,6 +148,7 @@ const iterateValidators = async ({ outputPath, validatorPaths }: { outputPath: s
   const allSdls: string[] = [banner, "import { gql } from 'graphql-tag';", 'export default gql`'];
 
   for (const path of validatorPaths) {
+    console.log('path is ', path);
     const validatorStr = fs.readFileSync(path, 'utf8');
     const validator = transpile(validatorStr);
     const v = eval(validator);
@@ -176,6 +178,11 @@ const genTypes = async () => {
   const config = await getConfig();
   const validatorPaths = await getFullPaths('**/*.validator.*s');
 
+  if (!validatorPaths.length) {
+    console.info(`⚠️ ${pkg.name} could not find any validators files, downnloading from Mongo...`);
+    await downloadValidators();
+  }
+
   if (process.argv.includes('--watch') || process.argv.includes('-w')) {
     const onChange = async () =>
       iterateValidators({
@@ -194,4 +201,6 @@ const genTypes = async () => {
   });
 };
 
-genTypes();
+genTypes().catch((e) => {
+  console.error('❌ genTypes failed: ', e);
+});

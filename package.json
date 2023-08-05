@@ -3,8 +3,8 @@
   "bin": {
     "mtg": "bin/genTypes.js",
     "mtg-gen-types": "bin/genTypes.js",
-    "mtg-gen-validators": "bin/genValidators.js",
-    "mtg-add-validators": "bin/addValidators.js"
+    "mtg-download-validators": "bin/downloadValidators.js",
+    "mtg-upload-validators": "bin/uploadValidators.js"
   },
   "bugs": {
     "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"
@@ -66,7 +66,7 @@
     "url": "git+https://github.com/PaulSavignano/mongo-type-gen.git"
   },
   "scripts": {
-    "add-validators": "ts-node ./src/addValidators.ts",
+    "upload-validators": "ts-node ./src/uploadValidators.ts",
     "build": "rm -rf bin && node esbuild.mjs",
     "checks:ci": "npm run format && npm run lint && npm run typecheck && npm run build",
     "docker:down": "docker-compose -f docker-compose.local.yml down --remove-orphans",
@@ -75,7 +75,7 @@
     "format:fix": "prettier --write '**/*.{css,js,jsx,ts,tsx,json,htm,html,yml,yaml}'",
     "gen-types": "ts-node ./src/genTypes.ts -w",
     "gen-types:build": "node ./bin/genTypes.js",
-    "gen-validators": "ts-node ./src/genValidators.ts",
+    "download-validators": "ts-node ./src/downloadValidators.ts",
     "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
