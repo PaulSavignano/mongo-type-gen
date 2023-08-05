@@ -3,7 +3,7 @@
 <div align="center" dir="auto">
 	<img 
 		alt="main"
-		src="https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/pr.yml/badge.svg"
+		src="https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg"
 	/>
 </div>
 
