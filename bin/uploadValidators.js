@@ -45,7 +45,7 @@ var getConfig = async () => {
   const configPaths = await getFullPaths_default(["**/mtg.config.*s", "**/mongo-type-gen.config.*s"]);
   const configFile = await import(configPaths[0]);
   if (configPaths.length > 1) {
-    console.log(`\u26A0\uFE0F ${import_package.default.name} found multiple config files.  Using ${configPaths[0]}.`);
+    console.log(`\u{1F7E1} ${import_package.default.name} found multiple config files.  Using ${configPaths[0]}.`);
   }
   return configFile.default;
 };
@@ -87,5 +87,7 @@ async function uploadValidators() {
     await client.close();
   }
 }
-uploadValidators().catch(console.dir);
+uploadValidators().catch((e) => {
+  console.error("\u274C uploadValidators failed: ", e);
+});
 //# sourceMappingURL=uploadValidators.js.map
