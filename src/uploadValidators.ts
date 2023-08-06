@@ -9,7 +9,7 @@ import pkg from '../package.json';
 // Replace the uri string with your MongoDB deployment's connection string.
 let client: MongoClient;
 
-async function uploadValidators(): Promise<void> {
+async function uploadValidators(): Promise<number> {
   try {
     const config = await getConfig();
     const uri = 'mongodb://localhost:27017';
@@ -44,10 +44,18 @@ async function uploadValidators(): Promise<void> {
 
     await Promise.all(runCommandPromises);
     console.info(`✅ ${pkg.name} validators uploaded to Mongo!`);
+    return 0;
+  } catch (e) {
+    console.error('❌ uploadValidators failed: ', e);
+    return 1;
   } finally {
     await client.close();
   }
 }
-uploadValidators().catch((e) => {
-  console.error('❌ uploadValidators failed: ', e);
-});
+uploadValidators()
+  .then((code) => {
+    process.exit(code);
+  })
+  .catch((code) => {
+    process.exit(code);
+  });
