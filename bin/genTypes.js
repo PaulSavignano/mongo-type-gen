@@ -147,13 +147,15 @@ async function downloadValidators() {
     }
     await Promise.all(files);
     console.info(`\u2705 ${import_package3.default.name} validators downloaded from Mongo!`);
+    return 0;
+  } catch (e) {
+    console.error("\u274C downloadValidators failed: ", e);
+    return 1;
   } finally {
     await client.close();
   }
 }
-downloadValidators().catch((e) => {
-  console.error("\u274C downloadValidators failed: ", e);
-});
+var downloadValidators_default = downloadValidators;
 
 // src/genTypes.ts
 var import_package4 = __toESM(require("../package.json"));
@@ -269,7 +271,6 @@ var iterateValidators = async ({ outputPath, validatorPaths }) => {
   const allTypes = [banner, "import { ObjectId } from 'mongodb';"];
   const allSdls = [banner, "import { gql } from 'graphql-tag';", "export default gql`"];
   for (const path of validatorPaths) {
-    console.log("path is ", path);
     const validatorStr = import_fs3.default.readFileSync(path, "utf8");
     const validator = (0, import_typescript.transpile)(validatorStr);
     const v = eval(validator);
@@ -296,7 +297,7 @@ var genTypes = async () => {
   const validatorPaths2 = await getFullPaths_default("**/*.validator.*s");
   if (!validatorPaths2.length) {
     console.info(`\u26A0\uFE0F ${import_package4.default.name} could not find any validators files, downnloading from Mongo...`);
-    await downloadValidators();
+    await downloadValidators_default();
   }
   if (process.argv.includes("--watch") || process.argv.includes("-w")) {
     const onChange = async () => iterateValidators({
@@ -315,5 +316,6 @@ var genTypes = async () => {
 };
 genTypes().catch((e) => {
   console.error("\u274C genTypes failed: ", e);
+  process.exit(1);
 });
 //# sourceMappingURL=genTypes.js.map

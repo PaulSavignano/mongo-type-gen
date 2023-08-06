@@ -83,11 +83,17 @@ async function uploadValidators() {
     });
     await Promise.all(runCommandPromises);
     console.info(`\u2705 ${import_package2.default.name} validators uploaded to Mongo!`);
+    return 0;
+  } catch (e) {
+    console.error("\u274C uploadValidators failed: ", e);
+    return 1;
   } finally {
     await client.close();
   }
 }
-uploadValidators().catch((e) => {
-  console.error("\u274C uploadValidators failed: ", e);
+uploadValidators().then((code) => {
+  process.exit(code);
+}).catch((code) => {
+  process.exit(code);
 });
 //# sourceMappingURL=uploadValidators.js.map

@@ -31,7 +31,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/downloadValidators.ts
 var downloadValidators_exports = {};
 __export(downloadValidators_exports, {
-  downloadValidators: () => downloadValidators
+  default: () => downloadValidators_default
 });
 module.exports = __toCommonJS(downloadValidators_exports);
 var import_mongodb = require("mongodb");
@@ -105,15 +105,13 @@ async function downloadValidators() {
     }
     await Promise.all(files);
     console.info(`\u2705 ${import_package2.default.name} validators downloaded from Mongo!`);
+    return 0;
+  } catch (e) {
+    console.error("\u274C downloadValidators failed: ", e);
+    return 1;
   } finally {
     await client.close();
   }
 }
-downloadValidators().catch((e) => {
-  console.error("\u274C downloadValidators failed: ", e);
-});
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
-  downloadValidators
-});
+var downloadValidators_default = downloadValidators;
 //# sourceMappingURL=downloadValidators.js.map
