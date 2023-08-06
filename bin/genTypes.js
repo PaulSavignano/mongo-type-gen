@@ -44,7 +44,7 @@ var getConfig = async () => {
   const configPaths = await getFullPaths_default(["**/mtg.config.*s", "**/mongo-type-gen.config.*s"]);
   const configFile = await import(configPaths[0]);
   if (configPaths.length > 1) {
-    console.log(`\u26A0\uFE0F ${import_package.default.name} found multiple config files.  Using ${configPaths[0]}.`);
+    console.log(`\u{1F7E1} ${import_package.default.name} found multiple config files.  Using ${configPaths[0]}.`);
   }
   return configFile.default;
 };
@@ -151,7 +151,9 @@ async function downloadValidators() {
     await client.close();
   }
 }
-downloadValidators().catch(console.error);
+downloadValidators().catch((e) => {
+  console.error("\u274C downloadValidators failed: ", e);
+});
 
 // src/genTypes.ts
 var import_package4 = __toESM(require("../package.json"));
@@ -267,6 +269,7 @@ var iterateValidators = async ({ outputPath, validatorPaths }) => {
   const allTypes = [banner, "import { ObjectId } from 'mongodb';"];
   const allSdls = [banner, "import { gql } from 'graphql-tag';", "export default gql`"];
   for (const path of validatorPaths) {
+    console.log("path is ", path);
     const validatorStr = import_fs3.default.readFileSync(path, "utf8");
     const validator = (0, import_typescript.transpile)(validatorStr);
     const v = eval(validator);
@@ -310,5 +313,7 @@ var genTypes = async () => {
     validatorPaths: validatorPaths2
   });
 };
-genTypes();
+genTypes().catch((e) => {
+  console.error("\u274C genTypes failed: ", e);
+});
 //# sourceMappingURL=genTypes.js.map
