@@ -12,8 +12,10 @@ let client: MongoClient;
 async function uploadValidators(): Promise<number> {
   try {
     const config = await getConfig();
-    const uri = 'mongodb://localhost:27017';
-    client = new MongoClient(uri);
+    if (!config.uri) {
+      throw Error('I cannot connect to upload your validators to Mongo without a uri.');
+    }
+    client = new MongoClient(config.uri);
 
     const validatorPaths = await getFullPaths('**/*.validator.ts');
     const db = client.db(config.db);
@@ -46,7 +48,8 @@ async function uploadValidators(): Promise<number> {
     console.info(`✅ ${pkg.name} validators uploaded to Mongo!`);
     return 0;
   } catch (e) {
-    console.error('❌ uploadValidators failed: ', e);
+    const error = e instanceof Error ? e.message : e;
+    console.error(`❌ ${pkg.name} failed to download validators from Mongo: `, error);
     return 1;
   } finally {
     await client.close();

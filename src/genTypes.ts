@@ -175,6 +175,7 @@ const iterateValidators = async ({ outputPath, validatorPaths }: { outputPath: s
 
 const genTypes = async () => {
   const config = await getConfig();
+  const isWatching = process.argv.includes('--watch') || process.argv.includes('-w');
   const validatorPaths = await getFullPaths('**/*.validator.*s');
 
   if (!validatorPaths.length) {
@@ -182,7 +183,7 @@ const genTypes = async () => {
     await downloadValidators();
   }
 
-  if (process.argv.includes('--watch') || process.argv.includes('-w')) {
+  if (isWatching) {
     const onChange = async () =>
       iterateValidators({
         outputPath: config.output,

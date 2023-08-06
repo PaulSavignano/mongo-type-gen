@@ -11,8 +11,6 @@
   },
   "dependencies": {
     "fast-glob": "^3.3.0",
-    "fs": "^0.0.1-security",
-    "glob": "^10.3.3",
     "graphql-tag": "^2.12.6",
     "json-schema": "^0.4.0",
     "mongodb": "^5.7.0",
@@ -37,12 +35,12 @@
     "ts-node": "^10.9.1"
   },
   "directories": {
-    "example": "examples",
-    "lib": "lib"
+    "lib": "src"
   },
   "files": [
     "bin",
-    "LICENSE"
+    "LICENSE",
+    "tsconfig.json"
   ],
   "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme",
   "keywords": [
