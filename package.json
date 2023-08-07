@@ -1,13 +1,27 @@
 {
+  "name": "mongo-type-gen",
+  "description": "A type and sdl generator for MongoDB",
   "author": "paul@savignano.io",
+  "version": "1.0.26",
+  "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme",
+  "keywords": [
+    "GraphQL",
+    "Mongo",
+    "Typescript"
+  ],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PaulSavignano/mongo-type-gen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"
+  },
   "bin": {
     "mtg": "bin/genTypes.js",
     "mtg-gen-types": "bin/genTypes.js",
     "mtg-download-validators": "bin/runDownloadValidators.js",
     "mtg-upload-validators": "bin/uploadValidators.js"
-  },
-  "bugs": {
-    "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"
   },
   "dependencies": {
     "fast-glob": "^3.3.0",
@@ -16,7 +30,6 @@
     "mongodb": "^5.7.0",
     "typescript": "^5.1.6"
   },
-  "description": "A type and sdl generator for MongoDB",
   "devDependencies": {
     "@types/node": "^20.4.2",
     "@typescript-eslint/eslint-plugin": "^6.1.0",
@@ -42,15 +55,7 @@
     "LICENSE",
     "tsconfig.json"
   ],
-  "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme",
-  "keywords": [
-    "GraphQL",
-    "Mongo",
-    "Typescript"
-  ],
-  "license": "ISC",
-  "main": "mongo-type-gen.js",
-  "name": "mongo-type-gen",
+  "main": "bin/genTypes.js",
   "engines": {
     "node": ">=18.13.0"
   },
@@ -58,10 +63,6 @@
     "graphql-tag": "^2.0.0",
     "mongodb": "^5.0.0",
     "typescript": "^5.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PaulSavignano/mongo-type-gen.git"
   },
   "scripts": {
     "upload-validators": "ts-node ./src/uploadValidators.ts",
@@ -80,6 +81,5 @@
     "testing": "ts-node-dev ./src/testing.ts",
     "type-gen:build": "node ./bin/type-gen.js -w",
     "typecheck": "tsc --project . --noEmit"
-  },
-  "version": "1.0.26"
+  }
 }
