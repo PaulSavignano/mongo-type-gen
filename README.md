@@ -2,7 +2,7 @@
 
 <div align="center" dir="auto">
 
-Define types once, reuse them everywhere
+Define types once, reuse them everywhere!
 
 [![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml)
 [![NPM Version](https://img.shields.io/npm/v/mongo-type-gen.svg?style=flat)](https://www.npmjs.com/package/mongo-type-gen)
