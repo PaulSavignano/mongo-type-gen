@@ -12,7 +12,7 @@ const external = [
 const defaultOptions = {
   bundle: true,
   logLevel: 'debug',
-  minify: false,
+  minify: true,
   platform: 'node',
   sourcemap: true,
 };
