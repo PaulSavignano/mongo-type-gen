@@ -2,7 +2,7 @@
   "name": "mongo-type-gen",
   "description": "A type and sdl generator for MongoDB",
   "author": "paul@savignano.io",
-  "version": "1.0.26",
+  "version": "1.0.27",
   "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme",
   "keywords": [
     "GraphQL",
