@@ -1,13 +1,21 @@
 <h1 align="center">mongo-type-gen</h1>
 
 <div align="center" dir="auto">
-  <p>Define types once, reuse them everywhere</p>
-  [![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml)
-  [![NPM Version](https://img.shields.io/npm/v/mongo-type-gen.svg?style=flat)](https://www.npmjs.com/package/mongo-type-gen)
-  [![NPM Downloads](https://img.shields.io/npm/dm/mongo-type-gen.svg?style=flat)](https://npmcharts.com/compare/mongo-type-gen?minimal=true)
-  [![BundleSize](https://img.shields.io/bundlephobia/minzip/mongo-type-gen.svg)](https://bundlephobia.com/result?p=mongo-type-gen)
-  [![Patreon](https://img.shields.io/badge/patreon-support%20the%20author-blue.svg)](https://www.patreon.com/PaulSavignano)
+
+Define types once, reuse them everywhere
+
+[![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml)
+[![NPM Version](https://img.shields.io/npm/v/mongo-type-gen.svg?style=flat)](https://www.npmjs.com/package/mongo-type-gen)
+[![NPM Downloads](https://img.shields.io/npm/dm/mongo-type-gen.svg?style=flat)](https://npmcharts.com/compare/mongo-type-gen?minimal=true)
+[![BundleSize](https://img.shields.io/bundlephobia/minzip/mongo-type-gen.svg)](https://bundlephobia.com/result?p=mongo-type-gen)
+[![Patreon](https://img.shields.io/badge/patreon-support%20the%20author-blue.svg)](https://www.patreon.com/PaulSavignano)
+
 </div>
+
+`mongo-type-gen` is a lib for unifing your types. Define once, reuse everywhere!
+
+- **Simple:** Short `mtg` command allows for easy generating, uploading, and downloading of types.
+- **Performant:** Lightweight, with very few deps and a small bundle size.
 
 ## Table of Contents
 
@@ -25,11 +33,6 @@ Let's dry this up and only define our types once. Let mongo-type-gen handle the 
 First, let's identify the best source for types. What syntax allows us to be the most expressive 🤔. That's where Mongo's `$jsonSchema`` validators come into play. They allow for expression of meta data that cannot be expressed in Typescript, GraphQL, or Mongoose alone. This lib uses validators as the source.
 
 Whether you have your validators defined in your project or they live in MongoDB, we'll grab em' and generate your types and SDLs.
-
-This project handles the following busy work for you;
-
-- **Simple:** Short `mtg` command allows for easy generating, uploading, and downloading of types.
-- **Performant:** Lightweight, with very few deps and a small bundle size.
 
 ## Usage
 
@@ -70,3 +73,8 @@ This let's `mtg` learn where it should download or upload your validators. These
 We also have a watcher in play so any changes you make to your validators files will be reflected in your types.
 
 Define something like the following for your start script.
+
+## Validators
+
+Curious about validators? Check out Mongo's docs. Validators are awesome!
+https://www.mongodb.com/docs/upcoming/core/schema-validation/#schema-validation
