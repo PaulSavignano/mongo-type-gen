@@ -1,10 +1,12 @@
 <h1 align="center">mongo-type-gen</h1>
 
 <div align="center" dir="auto">
-	<img 
-		alt="release"
-		src="https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg"
-	/>
+  <p>Define types once, reuse them everywhere</p>
+  [![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml)
+  [![NPM Version](https://img.shields.io/npm/v/mongo-type-gen.svg?style=flat)](https://www.npmjs.com/package/mongo-type-gen)
+  [![NPM Downloads](https://img.shields.io/npm/dm/mongo-type-gen.svg?style=flat)](https://npmcharts.com/compare/mongo-type-gen?minimal=true)
+  [![BundleSize](https://img.shields.io/bundlephobia/minzip/mongo-type-gen.svg)](https://bundlephobia.com/result?p=mongo-type-gen)
+  [![Patreon](https://img.shields.io/badge/patreon-support%20the%20author-blue.svg)](https://www.patreon.com/PaulSavignano)
 </div>
 
 ## Table of Contents
@@ -12,12 +14,17 @@
 - [Motivation](#motivation)
 - [Usage](#usage)
 - [Config](#config)
+- [Validators](#validators)
 
 ## Motivation
 
-Working with typescript can involve some busy work in creating all the different types associated with your data. From GraphQL SDLs, to Typescript types, to Mongo JSON schemas. Let's dry this up and only define our types once. Let mongo-type-gen handle the busy work of producing the different types needed Tools like graphql codegen can help by generating typescript types from your GraphQL SDLs but do not help with Mongo Schema validation. Your either stuck reproducing the validators (types) in another file or looking to app level data validation through Mongoose. Either way, you drowning in writing wet types.
+Working with typescript can involve some busy work in creating all the different types associated with your data. From GraphQL SDLs, to Typescript types, to Mongo JSON schemas or Mongoose.
 
-Let's dry off. So, why use Mongo's json schema over GraphQL or Typescirpt. One simple answer, we want our source to be the most expressive source. Mongo's validators allow us to not only define types, but also valiation rules, descriptions, deprecations. Simply put, the Mongo JSON schema validation is the most rich way we to express our data.
+Let's dry this up and only define our types once. Let mongo-type-gen handle the busy work of producing the different types needed for your GraphQL app writen in Typescript.
+
+First, let's identify the best source for types. What syntax allows us to be the most expressive 🤔. That's where Mongo's `$jsonSchema`` validators come into play. They allow for expression of meta data that cannot be expressed in Typescript, GraphQL, or Mongoose alone. This lib uses validators as the source.
+
+Whether you have your validators defined in your project or they live in MongoDB, we'll grab em' and generate your types and SDLs.
 
 This project handles the following busy work for you;
 
@@ -26,15 +33,21 @@ This project handles the following busy work for you;
 
 ## Usage
 
-Add run scripts to package.json
+To get started, add the lib to your project. You'll only need it for local dev so install it as a dev dep.
+
+```bash
+npm i -D mongo-type-gen
+```
+
+Then create some ease-of-use scripts in your package.json.
 
 ```json
 {
   "scripts": {
-    "gen-types": "mtg",
-    "downlaod-validators": "mtg-download-validators",
-    "upload-validators": "mtg-upload-validators",
-    "start": "ts-node-dev ./src/index.ts & npm run mtg"
+    "gen-types": "mtg", // Root command, generate typescript and sdls from your **.validators.ts files
+    "downlaod-validators": "mtg-download-validators", // Utility fn to grag your validators from Mongo
+    "upload-validators": "mtg-upload-validators", // Utility fn to upload your local validators to Mongo
+    "start": "ts-node-dev ./src/index.ts & npm run mtg" // Example start scripts
   }
 }
 ```
@@ -52,12 +65,8 @@ module.exports = {
 };
 ```
 
-This let's `mtg` learn where it should download or upload your validators. These validators are used to generate Typescript types and GraphQL SDLs.
+This let's `mtg` learn where it should download or upload your validators. These validators are used to generate your data's Typescript types and GraphQL SDLs.
 
 We also have a watcher in play so any changes you make to your validators files will be reflected in your types.
 
 Define something like the following for your start script.
-
-```json
-"start": "ts-node-dev ./src/index.ts & mtg",
-```
