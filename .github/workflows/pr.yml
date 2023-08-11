@@ -3,8 +3,6 @@ name: pr
 on:
   pull_request:
     branches: [main]
-  release:
-    types: [published]
 
 jobs:
   checks:
