@@ -4,7 +4,7 @@
 
 Define types once, reuse them everywhere!
 
-[![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml)
+[![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yml)
 [![NPM Version](https://img.shields.io/npm/v/mongo-type-gen.svg?style=flat)](https://www.npmjs.com/package/mongo-type-gen)
 [![NPM Downloads](https://img.shields.io/npm/dm/mongo-type-gen.svg?style=flat)](https://npmcharts.com/compare/mongo-type-gen?minimal=true)
 [![BundleSize](https://img.shields.io/bundlephobia/minzip/mongo-type-gen.svg)](https://bundlephobia.com/result?p=mongo-type-gen)
