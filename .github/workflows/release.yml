@@ -1,14 +1,8 @@
 name: release
 
 on:
-  workflow_run:
-    workflows: ['pr']
-    branches: [main]
-    types:
-      - completed
-
-permissions:
-  contents: write
+  release:
+    types: [published]
 
 jobs:
   release:
@@ -41,6 +35,8 @@ jobs:
           echo "version=${version}" >> $GITHUB_OUTPUT
 
       - name: Update package.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           set -xe
           sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.version.outputs.version }}\"/" package.json
