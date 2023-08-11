@@ -18,14 +18,17 @@ jobs:
         with:
           node-version-file: 'package.json'
           registry-url: 'https://registry.npmjs.org'
+
       - name: Checks
         run: |
           set -xe
           npm ci --force
           # npm run checks:ci
+
       - name: Build
         run: |
           npm run build
+
       - name: Get Version
         id: version
         run: |
@@ -33,6 +36,7 @@ jobs:
           tag=${{ github.event.release.tag_name }}
           version=${tag#"v"}
           echo "version=${version}" >> $GITHUB_OUTPUT
+
       - name: Update package.json
         run: |
           set -xe
@@ -41,6 +45,7 @@ jobs:
           git config --local user.name "PaulSavignano"
           git commit -am "ci: update package.json version to ${{ steps.version.outputs.version }}"
           git push origin main
+
       - name: Publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
