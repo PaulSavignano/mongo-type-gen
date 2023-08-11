@@ -2,7 +2,7 @@ name: release
 
 on:
   workflow_run:
-    workflows: ['Checks']
+    workflows: ['pr']
     branches: [main]
     types:
       - completed
