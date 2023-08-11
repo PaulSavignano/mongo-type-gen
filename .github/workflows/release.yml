@@ -1,8 +1,11 @@
 name: release
 
 on:
-  release:
-    types: [published]
+  workflow_run:
+    workflows: ['Checks']
+    branches: [main]
+    types:
+      - completed
 
 permissions:
   contents: write
