@@ -9,13 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: main
-          token: ${{ secrets.PAT }}
+
       - uses: actions/setup-node@v3
         with:
           node-version-file: 'package.json'
-          registry-url: 'https://registry.npmjs.org'
 
       - name: Checks
         run: |
@@ -26,14 +23,6 @@ jobs:
       - name: Build
         run: |
           npm run build
-
-      - name: Get Version
-        id: version
-        run: |
-          set -xe
-          tag=${{ github.event.release.tag_name }}
-          version=${tag#"v"}
-          echo "version=${version}" >> $GITHUB_OUTPUT
 
       - name: Set package.json version to release
         run: |
