@@ -14,9 +14,6 @@
     "type": "git",
     "url": "https://github.com/PaulSavignano/mongo-type-gen.git"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "bugs": {
     "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"
   },
