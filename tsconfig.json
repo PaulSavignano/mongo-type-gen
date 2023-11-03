@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
+    "baseUrl": ".",
+    "declaration": true,
     "forceConsistentCasingInFileNames": true,
     "module": "commonjs",
     "noFallthroughCasesInSwitch": true,
@@ -13,8 +16,8 @@
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "es6"
+    "target": "esnext"
   },
-  "include": ["src"],
+  "include": ["src", ".eslintrc.js", "esbuild.mjs", "package.json", "commitlint.config.js", "examples"],
   "exclude": ["node_modules", "dist"]
 }

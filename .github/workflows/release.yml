@@ -20,7 +20,7 @@ jobs:
       - name: Checks
         run: |
           set -xe
-          npm ci --force
+          npm ci
           # npm run checks:ci
 
       - name: Build
@@ -35,14 +35,14 @@ jobs:
           version=${tag#"v"}
           echo "version=${version}" >> $GITHUB_OUTPUT
 
-      - name: Update package.json
+      - name: Set package.json version to release
         run: |
           set -xe
-          sed -i "s/\"version\": \".*\"/\"version\": \"${{ steps.version.outputs.version }}\"/" package.json
-          git config --local user.email "paul.savignano@gmail.com"
-          git config --local user.name "PaulSavignano"
-          git commit -am "ci: update package.json version to ${{ steps.version.outputs.version }}"
-          git push origin main
+          version=$(echo "${{ github.event.release.tag_name }}" | sed -E 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          echo "version is set to $version"
+          sed -i "s/\"version\": \".*\"/\"version\": \"$version\"/" package.json
+          echo "package.json updated"
+          cat package.json
 
       - name: Publish
         env:

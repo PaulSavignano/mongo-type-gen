@@ -1,6 +1,5 @@
 module.exports = {
   env: {
-    es6: true,
     node: true,
   },
   extends: [
@@ -12,9 +11,8 @@ module.exports = {
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    allowImportExportEverywhere: true,
-    ecmaVersion: 2023,
-    sourceType: 'module',
+    project: true,
+    tsconfigRootDir: __dirname,
   },
   plugins: [
     'sort-class-members',

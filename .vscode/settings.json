@@ -1,25 +1,6 @@
 {
-  "[dockercompose]": { "editor.autoIndent": "advanced" },
   "[json]": { "editor.defaultFormatter": "vscode.json-language-features" },
   "[typescript]": { "editor.defaultFormatter": "esbenp.prettier-vscode" },
-  "[yaml]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 2,
-    "editor.autoIndent": "advanced",
-    "editor.formatOnSave": true
-  },
-  "[yml]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 2,
-    "editor.autoIndent": "advanced",
-    "editor.formatOnSave": true
-  },
-  "[yaml.github-actions]": {
-    "editor.insertSpaces": true,
-    "editor.tabSize": 2,
-    "editor.autoIndent": "advanced",
-    "editor.formatOnSave": true
-  },
   "editor.autoClosingBrackets": "always",
   "editor.bracketPairColorization.enabled": true,
   "editor.codeActionsOnSave": { "source.fixAll": true, "source.fixAll.eslint": true },
@@ -30,17 +11,10 @@
   "editor.tabSize": 2,
   "emmet.includeLanguages": { "javascript": "javascriptreact" },
   "eslint.format.enable": true,
-  "eslint.validate": ["graphql", "javascript", "javascriptreact", "typescript", "typescriptreact"],
-  "eslint.workingDirectories": [{ "mode": "auto" }],
   "files.autoSave": "off",
   "git.autofetch": true,
   "typescript.preferences.importModuleSpecifier": "relative",
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.workspaceSymbols.scope": "currentProject",
-  "window.zoomLevel": 0,
-  "yaml.schemas": {
-    "https://json.schemastore.org/github-workflow": ["*.github/workflows/*.yaml", "/.github/workflows/**/*.yml"],
-    "https://json.schemastore.org/github-workflow.json": ["*.github/workflows/*.yaml", "*.github/workflows/*.yml"],
-    "https://json.schemastore.org/github-action.json": ["action.yaml", "action.yml"]
-  }
+  "window.zoomLevel": 0
 }

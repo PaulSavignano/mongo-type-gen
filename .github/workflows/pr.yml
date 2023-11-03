@@ -15,5 +15,5 @@ jobs:
           node-version-file: 'package.json'
       - run: |
           set -xe
-          npm ci --force
+          npm ci
           npm run checks:ci
