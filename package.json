@@ -23,7 +23,7 @@
   "bin": {
     "mtg": "bin/genTypes.js",
     "mtg-gen-types": "bin/genTypes.js",
-    "mtg-download-validators": "bin/runDownloadValidators.js",
+    "mtg-download-validators": "bin/downloadValidators.js",
     "mtg-upload-validators": "bin/uploadValidators.js"
   },
   "dependencies": {
