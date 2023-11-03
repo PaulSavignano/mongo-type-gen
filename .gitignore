@@ -3,6 +3,7 @@
 *_override.tf
 .DS_Store
 .eslintcache
+bin/
 coverage
 dist
 docker-compose-volumes
