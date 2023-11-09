@@ -1,16 +1,17 @@
-import fs from 'fs';
 import { JSONSchema4 } from 'json-schema';
-import { transpile } from 'typescript';
 
-import getConfig from './common/getConfig';
-import getFullPaths from './common/getFullPaths';
+import getConfig, { Config } from './common/getConfig';
+import getFilenames from './common/getFilenames';
+import getJsonSchema from './common/getJsonSchema';
+import importFile from './common/importFile';
 import singularize from './common/singularize';
-import watchDirs from './common/watchDirs';
-import writeFileAsync from './common/writeFileAsync';
-import downloadValidators from './downloadValidators';
+import watchFilenames from './common/watchFilenames';
+import writeFile from './common/writeFile';
+import downloadCollections from './downloadCollections';
+import uploadCollections from './uploadCollections';
 import pkg from '../package.json';
 
-const typeMapping: Record<string, string> = {
+const tsMapping: Record<string, string> = {
   bool: 'boolean',
   date: 'Date',
   double: 'number',
@@ -32,37 +33,41 @@ const sdlMapping: Record<string, string> = {
 
 const reduce = ({
   allSdls = [],
-  allTypes = [],
+  allTs = [],
   schemaObj,
   typeName,
 }: {
   allSdls: string[];
-  allTypes: string[];
+  allTs: string[];
   schemaObj: Record<string, JSONSchema4>;
   typeName: string;
 }) => {
-  const { properties, required = [] } = schemaObj;
-  const typeResult: string[] = [];
+  const tsResult: string[] = [];
   const sdlResult: string[] = [];
 
+  const { properties, required = [] } = schemaObj;
+  if (!properties) return;
+
   const propKeys = Object.keys(properties).sort();
+
   for (const k of propKeys) {
     const value = properties[k];
     const isKeyRequired = required.includes(k);
-    const typeKey = isKeyRequired ? k : `${k}?`;
+    const tsKey = isKeyRequired ? k : `${k}?`;
     const sdlKey = k;
-
     const properK = k.charAt(0).toUpperCase() + k.slice(1);
     const childType = `${typeName}${properK}`;
 
     if (value.enum) {
-      const enumType = [
+      tsResult.push(`  ${tsKey}: ${childType}Enum;`);
+      const enumTs = [
         `export enum ${childType}Enum {`,
         ...value.enum.sort().map((v: string) => `  ${v} = '${v}',`),
         '}',
       ].join('\n');
-      allTypes.push(enumType);
+      allTs.push(enumTs);
 
+      sdlResult.push(`    ${sdlKey}: ${childType}Enum${isKeyRequired ? '!' : ''}`);
       const enumSdl = [`   enum ${childType}Enum {`, ...value.enum.map((v: string) => `    ${v}`), '  }'].join('\n');
       allSdls.push(enumSdl);
       continue;
@@ -70,42 +75,50 @@ const reduce = ({
 
     if (typeof value.bsonType === 'string') {
       if (value.bsonType === 'array') {
-        const mappedItemType = typeMapping[value.items.bsonType];
-        const itemTypeValue = mappedItemType ? mappedItemType : childType;
+        const mappedItemTs = tsMapping[value.items.bsonType];
+        const itemTsValue = mappedItemTs ? mappedItemTs : singularize(childType);
+        tsResult.push(`  ${tsKey}: ${itemTsValue}[];`);
+
         const mappedItemSdl = sdlMapping[value.items.bsonType];
-        const itemSdlValue = mappedItemSdl ? mappedItemSdl : childType;
-        typeResult.push(`  ${typeKey}: ${itemTypeValue}[];`);
+        const itemSdlValue = mappedItemSdl ? mappedItemSdl : singularize(childType);
         sdlResult.push(`    ${sdlKey}: [${itemSdlValue}${isKeyRequired ? '!' : ''}]`);
-        if (!mappedItemType) {
+
+        if (!mappedItemTs) {
           reduce({
             allSdls,
-            allTypes,
+            allTs,
             schemaObj: value.items,
-            typeName: childType,
+            typeName: singularize(childType),
           });
         }
-
         continue;
       }
 
       if (value.bsonType === 'object') {
-        typeResult.push(`  ${typeKey}: ${childType};`);
+        if (!value.properties) {
+          tsResult.push(`  ${tsKey}: Record<string, unknown>;`);
+          allSdls.push('scalar JSONObject');
+          allSdls.push(`    ${sdlKey}: JSONObject${isKeyRequired ? '!' : ''}`);
+          continue;
+        }
+
+        tsResult.push(`  ${tsKey}: ${childType};`);
         sdlResult.push(`    ${sdlKey}: ${childType}${isKeyRequired ? '!' : ''}`);
         reduce({
           allSdls,
-          allTypes,
+          allTs,
           schemaObj: value,
           typeName: childType,
         });
         continue;
       }
 
-      const mappedTypeValue = typeMapping[value.bsonType];
+      const mappedTsValue = tsMapping[value.bsonType];
       const mappedSdlValue = sdlMapping[value.bsonType];
 
-      if (mappedTypeValue || mappedTypeValue) {
-        if (mappedTypeValue) {
-          typeResult.push(`  ${typeKey}: ${mappedTypeValue};`);
+      if (mappedTsValue || mappedTsValue) {
+        if (mappedTsValue) {
+          tsResult.push(`  ${tsKey}: ${mappedTsValue};`);
         }
 
         if (mappedSdlValue) {
@@ -116,59 +129,75 @@ const reduce = ({
     }
 
     if (Array.isArray(value.bsonType)) {
-      const valid = value.bsonType.includes('null') || value.bsonType.length === 1;
-      if (!valid) {
-        throw Error('Only one bsonType and null are supported for a bsonType array');
+      const isValidBsonType = value.bsonType.includes('null') || value.bsonType.length === 1;
+      if (!isValidBsonType) {
+        throw Error('Only one bsonType and null are supported for a bsonType array at this time');
       }
-      // handle Typescript
-      const res: string[] = [];
-      value.bsonType.forEach((v: string) => {
-        const mapped = typeMapping[v];
-        if (v === 'null') {
-          res.push('null');
-        } else if (mapped) {
-          res.push(mapped);
-        }
-      });
-      typeResult.push(`  ${typeKey}: ${res.join(' | ')};`);
+      const tsValues = value.bsonType
+        .map((v: string) => {
+          const mapped = tsMapping[v];
+          if (v === 'null') {
+            return 'null';
+          } else if (mapped) {
+            return mapped;
+          }
+          return undefined;
+        })
+        .filter(Boolean);
+      tsResult.push(`  ${tsKey}: ${tsValues.join(' | ')};`);
 
-      // handle SDL
-      const singleType = value.bsonType.filter((v: string) => v !== 'null');
-      sdlResult.push(`    ${sdlKey}: ${sdlMapping[singleType[0]]}${isKeyRequired ? '!' : ''}`);
+      const sdlValues = value.bsonType.filter((v: string) => v !== 'null');
+      sdlResult.push(`    ${sdlKey}: ${sdlMapping[sdlValues[0]]}${isKeyRequired ? '!' : ''}`);
     }
   }
 
-  allTypes.push([`export type ${typeName} = {`, ...typeResult, '};'].join('\n'));
+  allTs.push([`export type ${typeName} = {`, ...tsResult, '};'].join('\n'));
   allSdls.push([`  type ${typeName} {`, ...sdlResult, '  }'].join('\n'));
 };
 
-const typeGenerator = async ({ collectionPaths, outputPath }: { collectionPaths: string[]; outputPath: string }) => {
-  const banner = `/* This file is generated by ${pkg.name}.  Do not edit */`;
-  const allTypes: string[] = [banner, "import { ObjectId } from 'mongodb';"];
-  const allSdls: string[] = [banner, "import { gql } from 'graphql-tag';", 'export default gql`'];
+const typeGenerator = async ({ filenames, output }: { filenames: string[]; output: Config['output'] }) => {
+  const banner = `/* This file is generated by ${pkg.name}.  Do not edit this file.  Edit the $jsonSchema in in **.collection.ts. */`;
+  const tsHeader: string[] = [banner, "import { ObjectId } from 'mongodb';"];
+  const sdlsHeader: string[] = [banner, "import { gql } from 'graphql-tag';", 'export default gql`'];
+  const allTs: string[] = [];
+  const allSdls: string[] = [];
+  const collectionNames = [];
 
-  for (const path of collectionPaths) {
-    const validatorStr = fs.readFileSync(path, 'utf8');
-    const validator = transpile(validatorStr);
-    const v = eval(validator);
-    const cName = path.split('/').pop()?.split('.')[0] || '';
-    const properCname = cName.charAt(0).toUpperCase() + cName.slice(1);
-    const singularCname = singularize(properCname);
+  for (const filename of filenames) {
+    const collectionObj = await importFile(filename);
+    const $jsonSchema = getJsonSchema(collectionObj, '$jsonSchema');
+
+    if (!$jsonSchema) {
+      throw Error(`${filename} must export a default object with a $jsonSchema property`);
+    }
+    const collectionName = filename.split('/').pop()?.split('.')[0] || '';
+    collectionNames.push(collectionName);
+    const properCaseCollectionName = collectionName.charAt(0).toUpperCase() + collectionName.slice(1);
+    const singularCollectionName = singularize(properCaseCollectionName);
+
     reduce({
       allSdls,
-      allTypes,
-      schemaObj: v.$jsonSchema,
-      typeName: `${singularCname}Doc`,
+      allTs,
+      schemaObj: $jsonSchema as JSONSchema4,
+      typeName: `${singularCollectionName}Doc`,
     });
   }
 
-  const tsString = allTypes.join('\n\n');
-  const sdlString = [...allSdls, '`;'].join('\n\n');
+  const tsCollectionNameEnumValues = collectionNames.sort().map((v) => `  ${v} = '${v}',`);
+  const tsCollectionNameEnum = ['export enum CollectionEnum {', ...tsCollectionNameEnumValues, '}'].join('\n');
+  tsHeader.push(tsCollectionNameEnum);
 
-  const writeFilePromises = [writeFileAsync(`./${outputPath}/mongo.types.ts`, tsString)];
+  const sdlCollectionNameEnumValues = collectionNames.map((v) => `    ${v}`);
+  const sdlCollectionNameEnum = ['  enum CollectionEnum {', ...sdlCollectionNameEnumValues, '  }'].join('\n');
+  sdlsHeader.push(sdlCollectionNameEnum);
 
-  if (process.argv.includes('--sdls')) {
-    writeFilePromises.push(writeFileAsync(`./${outputPath}/mongo.sdls.ts`, sdlString));
+  const tsFileString = [...tsHeader, ...allTs].join('\n\n');
+  const sdlFileString = [...sdlsHeader, ...allSdls, '`;'].join('\n\n');
+
+  const writeFilePromises = [writeFile({ data: tsFileString, dir: output.types, file: 'mongo.types.ts' })];
+
+  if (process.argv.includes('-sdls')) {
+    writeFilePromises.push(writeFile({ data: sdlFileString, dir: output.sdls || output.types, file: 'mongo.sdls.ts' }));
   }
 
   await Promise.all(writeFilePromises);
@@ -177,34 +206,29 @@ const typeGenerator = async ({ collectionPaths, outputPath }: { collectionPaths:
 };
 
 const genTypes = async () => {
-  const config = await getConfig();
-  const isWatching = process.argv.includes('--watch') || process.argv.includes('-w');
-  const collectionPaths = await getFullPaths('**/*.collection.*s');
+  try {
+    const { input, output } = await getConfig();
+    const isWatching = process.argv.includes('--watch') || process.argv.includes('-w');
+    const filenames = await getFilenames(input);
 
-  if (!collectionPaths.length) {
-    console.info(`⚠️ ${pkg.name} could not find any collection files, attempting to download from Mongo...`);
-    await downloadValidators();
+    if (!filenames.length) {
+      console.info(`⚠️ ${pkg.name} could not find any collection files, attempting to download from Mongo...`);
+      await downloadCollections();
+    }
+
+    const generate = async () => {
+      await Promise.all([uploadCollections(), typeGenerator({ filenames, output })]);
+    };
+
+    if (isWatching && filenames.length) {
+      watchFilenames({ filenames, onChange: generate });
+    }
+
+    await generate();
+  } catch (e) {
+    const error = e instanceof Error ? JSON.stringify(e, Object.getOwnPropertyNames(e)) : e;
+    console.error(`❌ ${pkg.name} failed: `, error);
   }
-
-  if (isWatching) {
-    const onChange = async () =>
-      typeGenerator({
-        collectionPaths,
-        outputPath: config.output,
-      });
-    watchDirs({
-      dirs: collectionPaths,
-      onChange,
-    });
-  }
-
-  typeGenerator({
-    collectionPaths,
-    outputPath: config.output,
-  });
 };
 
-genTypes().catch((e) => {
-  console.error(`❌ ${pkg.name} failed: `, e);
-  process.exit(1);
-});
+genTypes().then(() => process.exit(0));

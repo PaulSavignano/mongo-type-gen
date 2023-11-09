@@ -1,84 +1,89 @@
 {
-  "name": "mongo-type-gen",
-  "description": "A type and sdl generator for MongoDB",
   "author": "paul@savignano.io",
-  "version": "0.0.0",
-  "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme",
-  "keywords": [
-    "GraphQL",
-    "Mongo",
-    "Typescript"
-  ],
-  "license": "ISC",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/PaulSavignano/mongo-type-gen.git"
+  "bin": {
+    "mtg": "bin/genTypes.js",
+    "mtg-download-collections": "bin/runDownloadCollections.js",
+    "mtg-gen-types": "bin/genTypes.js",
+    "mtg-upload-collections": "bin/runUploadCollections.js"
   },
   "bugs": {
     "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"
-  },
-  "bin": {
-    "mtg": "bin/genTypes.js",
-    "mtg-gen-types": "bin/genTypes.js",
-    "mtg-download-validators": "bin/downloadValidators.js",
-    "mtg-upload-validators": "bin/uploadValidators.js"
   },
   "dependencies": {
     "fast-glob": "^3.3.1",
     "graphql-tag": "^2.0.0",
     "json-schema": "^0.4.0",
-    "mongodb": "^6.1.0",
-    "typescript": "^5.2.2"
+    "mongodb": "^5.0.0",
+    "typescript": "^5.0.0"
   },
+  "description": "A type and sdl generator for MongoDB jsonSchema",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
-    "@typescript-eslint/parser": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "env-cmd": "^10.1.0",
     "esbuild": "^0.19.4",
-    "eslint": "^8.51.0",
+    "eslint": "^8.53.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsonc": "^2.10.0",
     "eslint-plugin-prettier": "^5.0.1",
     "eslint-plugin-sort-class-members": "^1.19.0",
     "eslint-plugin-sort-destructure-keys": "^1.5.0",
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "eslint-plugin-typescript-sort-keys": "^3.1.0",
+    "eslint-plugin-yml": "^1.10.0",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.1"
   },
   "directories": {
     "lib": "src"
   },
+  "engines": {
+    "node": "20.9.0"
+  },
   "files": [
     "bin",
     "LICENSE",
     "tsconfig.json"
   ],
+  "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme",
+  "keywords": [
+    "GraphQL",
+    "Mongo",
+    "Typescript",
+    "Types"
+  ],
+  "license": "ISC",
   "main": "bin/genTypes.js",
-  "engines": {
-    "node": "20.9.0"
-  },
+  "name": "mongo-type-gen",
   "peerDependencies": {
     "graphql-tag": "^2.0.0",
     "mongodb": "^5.0.0",
     "typescript": "^5.0.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/PaulSavignano/mongo-type-gen.git"
+  },
   "scripts": {
-    "upload-validators": "ts-node ./src/uploadValidators.ts",
     "build": "rm -rf bin && node esbuild.mjs",
     "checks:ci": "npm run format && npm run lint && npm run typecheck && npm run build",
     "docker:down": "docker compose -f compose.dev.yaml down --remove-orphans",
     "docker:up": "docker compose -f compose.dev.yaml up -d",
+    "downloadCollections": "ts-node ./src/runDownloadCollections.ts",
     "format": "prettier --list-different '**/*.{css,js,jsx,ts,tsx,json,htm,html,yml,yaml}'",
     "format:fix": "prettier --write '**/*.{css,js,jsx,ts,tsx,json,htm,html,yml,yaml}'",
-    "gen-types": "ts-node ./src/genTypes.ts -w",
-    "gen-types:build": "node ./bin/genTypes.js",
-    "download-validators": "ts-node ./src/downloadValidators.ts",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "genTypes": "ts-node ./src/genTypes.ts -sdls",
+    "genTypes:build": "node ./bin/genTypes.js",
+    "genTypes:build:watch": "node ./bin/genTypes.js -w",
+    "genTypes:watch": "ts-node ./src/genTypes.ts -w -sdls",
+    "lint": "eslint . --ext .ts,.tsx,.js,.json,.jsx,.yaml,.yml",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.json,.jsx,.yaml,.yml --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
     "testing": "ts-node-dev ./src/testing.ts",
-    "type-gen:build": "node ./bin/type-gen.js -w",
-    "typecheck": "tsc --project . --noEmit"
-  }
+    "typecheck": "tsc --project . --noEmit",
+    "uploadCollections": "ts-node ./src/uploadCollections.ts"
+  },
+  "version": "0.0.0"
 }

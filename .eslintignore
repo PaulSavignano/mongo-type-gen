@@ -1,7 +1,9 @@
+!/.vscode
+!/.github
 awcache
+bin
 coverage
 dist
-bin
 docker-compose-volumes
 node_modules
 package-lock.json

@@ -2,8 +2,11 @@
 *.swp
 *_override.tf
 .DS_Store
+.awcache
 .eslintcache
+.idea
 bin/
+compose-volumes
 coverage
 dist
 docker-compose-volumes

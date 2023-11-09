@@ -3,18 +3,43 @@ module.exports = {
     node: true,
   },
   extends: [
+    'plugin:yml/standard',
     'eslint:recommended',
     'prettier',
     'plugin:import/recommended',
     'plugin:import/typescript',
     'plugin:@typescript-eslint/recommended',
   ],
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      parser: '@typescript-eslint/parser',
+      rules: {
+        '@typescript-eslint/naming-convention': ['error', { format: ['PascalCase'], selector: 'typeLike' }],
+      },
+    },
+    {
+      files: ['*.json', '*.json5', '*.jsonc', '**/*.json'],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/sort-keys': ['error', 'asc'],
+      },
+    },
+    {
+      files: ['*.yaml', '*.yml', '.github/workflows/*.yml', '.github/workflows/*.yaml'],
+      parser: 'yaml-eslint-parser',
+      rules: {
+        'yml/quotes': ['error', { prefer: 'single' }],
+        'yml/sort-sequence-values': ['error', { order: { type: 'asc' }, pathPattern: '^.*$' }],
+      },
+    },
+  ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: true,
-    tsconfigRootDir: __dirname,
+    project: './tsconfig.json',
   },
   plugins: [
+    'jsonc',
     'sort-class-members',
     'sort-destructure-keys',
     'sort-keys-fix',
@@ -23,8 +48,8 @@ module.exports = {
   ],
   root: true,
   rules: {
-    '@typescript-eslint/naming-convention': ['error', { format: ['PascalCase'], selector: 'typeLike' }],
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+    'import/no-cycle': 'error',
     'import/order': [
       'error',
       {
@@ -32,6 +57,7 @@ module.exports = {
         groups: [['builtin', 'external'], 'internal'],
         'newlines-between': 'always',
         pathGroups: [
+          { group: 'external', pattern: 'newrelic', position: 'before' },
           { group: 'external', pattern: 'react', position: 'before' },
           { group: 'builtin', pattern: '@types' },
         ],

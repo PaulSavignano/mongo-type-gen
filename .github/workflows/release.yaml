@@ -8,29 +8,27 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.release.tag_name }}
 
       - uses: actions/setup-node@v3
         with:
-          node-version-file: 'package.json'
+          node-version-file: package.json
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Checks
+      - name: Run Checks and Build
         run: |
           set -xe
           npm ci
-          # npm run checks:ci
-
-      - name: Build
-        run: |
+          npm run checks:ci
           npm run build
 
       - name: Set package.json version to release
         run: |
           set -xe
-          version=$(echo "${{ github.event.release.tag_name }}" | sed -E 's/.*([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          tag="${{ github.event.release.tag_name }}"
+          version="${tag#v}"
           echo "version is set to $version"
           sed -i "s/\"version\": \".*\"/\"version\": \"$version\"/" package.json
           echo "package.json updated"
@@ -38,6 +36,6 @@ jobs:
 
       - name: Publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm publish

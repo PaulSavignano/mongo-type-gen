@@ -30,21 +30,21 @@ const runBuild = async () => {
       external,
       outfile: 'bin/genTypes.js',
     });
-    const buildDownloadValidators = build({
+    const buildDownloadCollections = build({
       ...defaultOptions,
       banner,
-      entryPoints: ['src/downloadValidators.ts'],
+      entryPoints: ['src/runDownloadCollections.ts'],
       external,
-      outfile: 'bin/downloadValidators.js',
+      outfile: 'bin/runDownloadCollections.js',
     });
-    const buildUploadValidators = build({
+    const buildUploadCollections = build({
       ...defaultOptions,
       banner,
-      entryPoints: ['src/uploadValidators.ts'],
+      entryPoints: ['src/runUploadCollections.ts'],
       external,
-      outfile: 'bin/uploadValidators.js',
+      outfile: 'bin/runUploadCollections.js',
     });
-    await Promise.all([buildGenTypes, buildDownloadValidators, buildUploadValidators]);
+    await Promise.all([buildGenTypes, buildDownloadCollections, buildUploadCollections]);
     console.info('✅ esbuild completed!');
   } catch (e) {
     console.info('❌ esbuild failed', e);
