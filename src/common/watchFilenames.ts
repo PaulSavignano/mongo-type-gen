@@ -2,13 +2,7 @@ import fs from 'fs';
 
 import pkg from '../../package.json';
 
-function watchFilenames({
-  filenames,
-  onChange,
-}: {
-  filenames: string[];
-  onChange: ({ filenames }: { filenames: string[] }) => Promise<void>;
-}) {
+function watchFilenames({ filenames, onChange }: { filenames: string[]; onChange: () => Promise<void> }) {
   console.info(`✅ ${pkg.name} watching `, filenames);
   let isChanging = false;
   filenames.forEach((filename) => {
@@ -16,7 +10,7 @@ function watchFilenames({
     watcher.on('change', async (_eventType, filename) => {
       if (!isChanging) {
         isChanging = true;
-        await onChange({ filenames });
+        await onChange();
         if (filename) {
           setTimeout(() => {
             isChanging = false;
@@ -26,7 +20,7 @@ function watchFilenames({
     });
 
     watcher.on('error', (e) => console.error(`❌ ${pkg.name} watchFilenames error: ${e.message}`));
-    watcher.on('close', () => console.log(`❌ ${pkg.name} watchFilenames closed`));
+    watcher.on('close', () => console.info(`🛑 ${pkg.name} watchFilenames closed`));
   });
 }
 

@@ -19,6 +19,8 @@ export default {
       }
     }
   ],
+  isGenerated: true,
+  name: 'students',
   validator: {
     $jsonSchema: {
       bsonType: 'object',

@@ -1,4 +1,4 @@
-const importFile = async <T>(filename: string) => {
+const importFileDefaultNoCache = async <T>(filename: string) => {
   const moduleKey = require.resolve(filename);
   delete require.cache[moduleKey];
   const file = await import(filename);
@@ -13,4 +13,4 @@ const importFile = async <T>(filename: string) => {
   return fileDefault;
 };
 
-export default importFile;
+export default importFileDefaultNoCache;

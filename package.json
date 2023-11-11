@@ -81,9 +81,8 @@
     "lint": "eslint . --ext .ts,.tsx,.js,.json,.jsx,.yaml,.yml",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.json,.jsx,.yaml,.yml --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "testing": "ts-node-dev ./src/testing.ts",
     "typecheck": "tsc --project . --noEmit",
-    "uploadCollections": "ts-node ./src/uploadCollections.ts"
+    "uploadCollections": "ts-node ./src/runUploadCollections.ts"
   },
   "version": "0.0.0"
 }

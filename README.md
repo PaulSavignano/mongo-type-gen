@@ -160,9 +160,9 @@ module.exports = {
 
 This let's `mtg` learn where it should download or upload your validators. These validators are used to generate your data's Typescript types and GraphQL SDLs.
 
-There is also have a watcher in play to catch any changes you make to your validators so your types remain up to date.
+There is also have a watcher in play to catch any changes you make to your collection's validator or indexes so your types and Mongo remain up to date.
 
-Define something like the following for your start script.
+When downloading your collection's validator and indexes from Mongo, `mtg` will add an `isGenerated` bool to the data. This lets `mtg` keep track of how to manage your collection data. If the bool is true, `mtg` will not upload your data to Mongo as it is expecting Mongo to be the source of truth. This is useful for apps that need Mongo's types but are not responsibile to setting validators and indexes. You can switch the role by simiply removing the `isGenerated` flag from the data.
 
 ## Validators
 

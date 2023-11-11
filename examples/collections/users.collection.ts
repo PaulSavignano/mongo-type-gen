@@ -14,6 +14,8 @@ export default {
       unique: true
     }
   ],
+  isGenerated: true,
+  name: 'users',
   validator: {
     $jsonSchema: {
       bsonType: 'object',

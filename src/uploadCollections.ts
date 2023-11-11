@@ -1,69 +1,117 @@
 import { MongoClient } from 'mongodb';
 
-import getConfig from './common/getConfig';
-import getFilenames from './common/getFilenames';
-import importFile from './common/importFile';
-import MongoCollection from './types/MongoCollection';
+import MtgCollection from './types/MtgCollection';
 import pkg from '../package.json';
 
 let client: MongoClient;
-async function uploadCollections(): Promise<void> {
+
+const logResult = ({
+  errors,
+  hasErrors,
+  hasIndexes,
+  hasValidator,
+  isLogging,
+}: {
+  errors: Record<string, Record<string, unknown[]>>;
+  hasErrors: boolean;
+  hasIndexes: boolean;
+  hasValidator: boolean;
+  isLogging: boolean;
+}) => {
+  const log = [];
+  if (hasErrors) {
+    log.push('🟡');
+  } else {
+    log.push('✅');
+  }
+  log.push(pkg.name);
+
+  if (hasValidator && hasIndexes) {
+    log.push('validator and indexes');
+  } else if (hasValidator) {
+    log.push('validator');
+  } else if (hasIndexes) {
+    log.push('indexes');
+  }
+  log.push('upload completed');
+  if (hasErrors) {
+    log.push('but received errors');
+  } else {
+    log.push('successfully!');
+  }
+  const str = log.join(' ');
+
+  if (hasErrors) {
+    console.warn(str, JSON.stringify(errors, null, 2));
+  } else if (isLogging) {
+    console.info(str);
+  }
+};
+async function uploadCollections({
+  collections,
+  db,
+  isLogging,
+  uri,
+}: {
+  collections: MtgCollection[];
+  db: string;
+  isLogging: boolean;
+  uri: string;
+}): Promise<void> {
   try {
-    const { db, input, uri } = await getConfig();
     client = new MongoClient(uri);
 
-    const collectionFilenames = await getFilenames(input);
     const mongoDb = client.db(db);
 
-    const collections = await mongoDb.listCollections().toArray();
-    const collectionNames = collections.map((c) => c.name);
+    const mongoCollections = await mongoDb.listCollections().toArray();
+    const mongoCollectionNames = mongoCollections.map((c) => c.name);
 
-    const errors: Record<string, unknown[]> = {};
+    const errors: Record<string, Record<string, unknown[]>> = {};
     let hasErrors = false;
-    const runCommandPromises = collectionFilenames.map(async (filename) => {
-      const { indexes, isGenerated, validator } = await importFile<MongoCollection>(filename);
-
-      if (isGenerated) {
-        console.warn(`🟡 ${pkg.name} skipping ${filename} because it is generated`);
+    let hasValidator = false;
+    let hasIndexes = false;
+    const runCommandPromises = collections.map(async (c) => {
+      if (c.isGenerated) {
+        if (isLogging) {
+          console.warn(`🟡 ${pkg.name} skipping ${c.name} because it is generated`);
+        }
         return undefined;
       }
 
-      const collectionName = filename.split('/').pop()?.split('.')[0] || '';
-      errors[collectionName] = [];
-      const handleE = (e: unknown) => {
-        errors[collectionName].push(e);
-        hasErrors = true;
-      };
-
-      if (validator) {
-        const collMod = collectionName;
-        const isExisting = collectionNames.includes(collectionName);
+      if (c.validator) {
+        hasValidator = true;
+        const handleE = (e: unknown) => {
+          errors[c.name]['validator'].push(e);
+          hasErrors = true;
+        };
+        const collMod = c.name;
+        const isExisting = mongoCollectionNames.includes(c.name);
 
         if (isExisting) {
-          await mongoDb.command({ collMod, validator }).catch(handleE);
+          await mongoDb.command({ collMod, validator: c.validator }).catch(handleE);
         } else {
-          await mongoDb.createCollection(collectionName, { validator }).catch(handleE);
+          await mongoDb.createCollection(c.name, { validator: c.validator }).catch(handleE);
         }
       }
 
-      if (indexes && indexes.length) {
-        const col = mongoDb.collection(collectionName);
-        await col.createIndexes(indexes).catch(handleE);
+      if (c.indexes && c.indexes.length) {
+        hasIndexes = true;
+        const handleE = (e: unknown) => {
+          errors[c.name]['indexes'].push(e);
+          hasErrors = true;
+        };
+        const col = mongoDb.collection(c.name);
+        await col.createIndexes(c.indexes).catch(handleE);
       }
     });
 
     await Promise.all(runCommandPromises);
 
-    if (hasErrors) {
-      console.warn(`🟡 ${pkg.name} collections uploaded to Mongo with errors`, JSON.stringify(errors, null, 2));
-    } else {
-      console.info(`✅ ${pkg.name} collections uploaded to Mongo!`);
-    }
+    logResult({ errors, hasErrors, hasIndexes, hasValidator, isLogging });
   } catch (e) {
     const error = e instanceof Error ? e.message : e;
     console.error(`❌ ${pkg.name} failed to download validators from Mongo: `, error);
   } finally {
-    console.log('closing client');
     await client.close();
   }
 }
