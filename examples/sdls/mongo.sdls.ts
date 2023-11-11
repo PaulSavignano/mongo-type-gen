@@ -9,12 +9,6 @@ export default gql`
     users
   }
 
-  type StudentDoc {
-    gpa: Float
-    name: String!
-    year: Int!
-  }
-
   type UserDocAddressChildren {
     _id: ObjectId!
     age: Int!
@@ -61,6 +55,12 @@ export default gql`
     gender: UserDocGenderEnum
     name: String!
     roles: [String]
+  }
+
+  type StudentDoc {
+    gpa: Float
+    name: String!
+    year: Int!
   }
 
 `;

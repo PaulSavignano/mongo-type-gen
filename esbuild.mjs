@@ -33,16 +33,16 @@ const runBuild = async () => {
     const buildDownloadCollections = build({
       ...defaultOptions,
       banner,
-      entryPoints: ['src/runDownloadCollections.ts'],
+      entryPoints: ['src/downloadCollections.ts'],
       external,
-      outfile: 'bin/runDownloadCollections.js',
+      outfile: 'bin/downloadCollections.js',
     });
     const buildUploadCollections = build({
       ...defaultOptions,
       banner,
-      entryPoints: ['src/runUploadCollections.ts'],
+      entryPoints: ['src/uploadCollections.ts'],
       external,
-      outfile: 'bin/runUploadCollections.js',
+      outfile: 'bin/uploadCollections.js',
     });
     await Promise.all([buildGenTypes, buildDownloadCollections, buildUploadCollections]);
     console.info('✅ esbuild completed!');

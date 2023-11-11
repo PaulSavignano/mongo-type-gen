@@ -2,9 +2,9 @@
   "author": "paul@savignano.io",
   "bin": {
     "mtg": "bin/genTypes.js",
-    "mtg-download-collections": "bin/runDownloadCollections.js",
+    "mtg-download-collections": "bin/downloadCollections.js",
     "mtg-gen-types": "bin/genTypes.js",
-    "mtg-upload-collections": "bin/runUploadCollections.js"
+    "mtg-upload-collections": "bin/uploadCollections.js"
   },
   "bugs": {
     "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"

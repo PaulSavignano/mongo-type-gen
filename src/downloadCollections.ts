@@ -1,6 +1,6 @@
+import fetchCollections from './common/fetchCollections';
 import getConfig from './common/getConfig';
-import fetchCollections from './fetchCollections';
-import writeCollectionFiles from './writeCollectionFiles';
+import writeCollectionFiles from './common/writeCollectionFiles';
 
 const downloadCollections = async () => {
   const { db, output, uri } = await getConfig();

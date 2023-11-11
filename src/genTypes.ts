@@ -1,16 +1,16 @@
 import { JSONSchema4 } from 'json-schema';
 
+import fetchCollections from './common/fetchCollections';
+import getCollectionsFromFiles from './common/getCollectionsFromFiles';
 import getConfig, { Config } from './common/getConfig';
 import getFilenames from './common/getFilenames';
 import getJsonSchema from './common/getJsonSchema';
 import singularize from './common/singularize';
 import watchFilenames from './common/watchFilenames';
+import writeCollectionFiles from './common/writeCollectionFiles';
 import writeFile from './common/writeFile';
-import fetchCollections from './fetchCollections';
-import getCollectionsFromFiles from './getCollectionsFromFiles';
 import MtgCollection from './types/MtgCollection';
-import uploadCollections from './uploadCollections';
-import writeCollectionFiles from './writeCollectionFiles';
+import uploadCollections from './common/uploadValidatorsAndIndexes';
 import pkg from '../package.json';
 
 const tsMapping: Record<string, string> = {

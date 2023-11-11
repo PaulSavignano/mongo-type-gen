@@ -1,5 +1,5 @@
-import importFileDefaultNoCache from './common/importFileDefaultNoCache';
-import MtgCollection from './types/MtgCollection';
+import importFileDefaultNoCache from './importFileDefaultNoCache';
+import MtgCollection from '../types/MtgCollection';
 
 const getCollectionsFromFiles = async (filenames: string[]) => {
   const collections = await Promise.all(
