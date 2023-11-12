@@ -4,13 +4,13 @@ import fetchCollections from './common/fetchCollections';
 import getCollectionsFromFiles from './common/getCollectionsFromFiles';
 import getConfig, { Config } from './common/getConfig';
 import getFilenames from './common/getFilenames';
-import getJsonSchema from './common/getJsonSchema';
+import getPropInObj from './common/getPropInObj';
 import singularize from './common/singularize';
+import uploadValidatorsAndIndexes from './common/uploadValidatorsAndIndexes';
 import watchFilenames from './common/watchFilenames';
 import writeCollectionFiles from './common/writeCollectionFiles';
 import writeFile from './common/writeFile';
 import MtgCollection from './types/MtgCollection';
-import uploadCollections from './common/uploadValidatorsAndIndexes';
 import pkg from '../package.json';
 
 const tsMapping: Record<string, string> = {
@@ -101,8 +101,8 @@ const reduce = ({
       if (value.bsonType === 'object') {
         if (!value.properties) {
           tsResult.push(`  ${tsKey}: Record<string, unknown>;`);
-          allSdls.push('scalar JSONObject');
-          allSdls.push(`    ${sdlKey}: JSONObject${isKeyRequired ? '!' : ''}`);
+          allSdls.unshift('  scalar JSONObject');
+          sdlResult.push(`    ${sdlKey}: JSONObject${isKeyRequired ? '!' : ''}`);
           continue;
         }
 
@@ -164,19 +164,26 @@ const typeGenerator = async ({ collections, output }: { collections: MtgCollecti
   const sdlsHeader: string[] = [banner, "import { gql } from 'graphql-tag';", 'export default gql`'];
   const allTs: string[] = [];
   const allSdls: string[] = [];
-  const collectionNames = [];
+
+  const collectionNames = collections.map((c) => c.name);
+  const tsCollectionNameEnumValues = collectionNames.sort().map((v) => `  ${v} = '${v}',`);
+  const tsCollectionNameEnum = ['export enum CollectionEnum {', ...tsCollectionNameEnumValues, '}'].join('\n');
+  allTs.push(tsCollectionNameEnum);
+
+  const sdlCollectionNameEnumValues = collectionNames.map((v) => `    ${v}`);
+  const sdlCollectionNameEnum = ['  enum CollectionEnum {', ...sdlCollectionNameEnumValues, '  }'].join('\n');
+  allSdls.push(sdlCollectionNameEnum);
 
   for (const c of collections) {
-    const $jsonSchema = getJsonSchema(c, '$jsonSchema');
+    const $jsonSchema = getPropInObj(c, '$jsonSchema');
 
     if (!$jsonSchema) {
       console.warn(
-        `⚠️ ${pkg.name} could not find a $jsonSchema property in ${c.name}.collection.ts and is skipping that collection`,
+        `🟡 ${pkg.name} could not find a $jsonSchema property in ${c.name}.collection.ts and is skipping that collection`,
       );
       continue;
     }
 
-    collectionNames.push(c.name);
     const properCaseCollectionName = c.name.charAt(0).toUpperCase() + c.name.slice(1);
     const singularCollectionName = singularize(properCaseCollectionName);
 
@@ -187,14 +194,6 @@ const typeGenerator = async ({ collections, output }: { collections: MtgCollecti
       typeName: `${singularCollectionName}Doc`,
     });
   }
-
-  const tsCollectionNameEnumValues = collectionNames.sort().map((v) => `  ${v} = '${v}',`);
-  const tsCollectionNameEnum = ['export enum CollectionEnum {', ...tsCollectionNameEnumValues, '}'].join('\n');
-  tsHeader.push(tsCollectionNameEnum);
-
-  const sdlCollectionNameEnumValues = collectionNames.map((v) => `    ${v}`);
-  const sdlCollectionNameEnum = ['  enum CollectionEnum {', ...sdlCollectionNameEnumValues, '  }'].join('\n');
-  sdlsHeader.push(sdlCollectionNameEnum);
 
   const tsFileString = [...tsHeader, ...allTs].join('\n\n');
   const sdlFileString = [...sdlsHeader, ...allSdls, '`;'].join('\n\n');
@@ -211,16 +210,17 @@ const typeGenerator = async ({ collections, output }: { collections: MtgCollecti
 };
 
 const genTypes = async () => {
+  const isWatching = process.argv.includes('--watch') || process.argv.includes('-w');
   try {
     const { db, input, output, uri } = await getConfig();
-    const isWatching = process.argv.includes('--watch') || process.argv.includes('-w');
+
     const filenames = await getFilenames(input);
 
     if (!filenames.length) {
       console.info(`⚠️ ${pkg.name} could not find any collection files, attempting to download from Mongo...`);
       const collections = await fetchCollections({ db, uri });
       if (!collections.length) {
-        console.info(`⚠️ ${pkg.name} could not find any collections in Mongo, exiting...`);
+        console.info(`📡 ${pkg.name} could not find any collections in Mongo, exiting...`);
         return;
       }
       if (!output.collections && isWatching) {
@@ -234,10 +234,8 @@ const genTypes = async () => {
 
     const generate = async () => {
       const collections = await getCollectionsFromFiles(filenames);
-      await Promise.all([
-        uploadCollections({ collections, db, isLogging: false, uri }),
-        typeGenerator({ collections, output }),
-      ]);
+      await uploadValidatorsAndIndexes({ collections, db, uri });
+      await typeGenerator({ collections, output });
     };
     if (isWatching && filenames.length) {
       watchFilenames({ filenames, onChange: generate });
@@ -247,7 +245,11 @@ const genTypes = async () => {
   } catch (e) {
     const error = e instanceof Error ? JSON.stringify(e, Object.getOwnPropertyNames(e)) : e;
     console.error(`❌ ${pkg.name} failed: `, error);
+  } finally {
+    if (!isWatching) {
+      process.exit(0);
+    }
   }
 };
 
-genTypes().then(() => process.exit(0));
+genTypes();

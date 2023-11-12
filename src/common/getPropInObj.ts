@@ -1,6 +1,6 @@
 import { JSONSchema4 } from 'json-schema';
 
-const getJsonSchema = (val: unknown, key: string): unknown | JSONSchema4 => {
+const getPropInObj = (val: unknown, key: string): unknown | JSONSchema4 => {
   if (typeof val !== 'object' || val === null) {
     return undefined;
   }
@@ -14,13 +14,13 @@ const getJsonSchema = (val: unknown, key: string): unknown | JSONSchema4 => {
     const v = obj[k];
     if (Array.isArray(v)) {
       for (const item of v) {
-        const result = getJsonSchema(item, key);
+        const result = getPropInObj(item, key);
         if (result !== undefined) {
           return result;
         }
       }
     } else if (typeof obj[k] === 'object') {
-      const result = getJsonSchema(obj[k], key);
+      const result = getPropInObj(obj[k], key);
       if (result !== undefined) {
         return result;
       }
@@ -30,4 +30,4 @@ const getJsonSchema = (val: unknown, key: string): unknown | JSONSchema4 => {
   return undefined;
 };
 
-export default getJsonSchema;
+export default getPropInObj;

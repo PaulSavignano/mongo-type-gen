@@ -10,13 +10,11 @@ const logResult = ({
   hasErrors,
   hasIndexes,
   hasValidator,
-  isLogging,
 }: {
   errors: Record<string, Record<string, unknown[]>>;
   hasErrors: boolean;
   hasIndexes: boolean;
   hasValidator: boolean;
-  isLogging: boolean;
 }) => {
   const log = [];
   if (hasErrors) {
@@ -33,7 +31,7 @@ const logResult = ({
   } else if (hasIndexes) {
     log.push('indexes');
   }
-  log.push('upload completed');
+  log.push('upload to Mongo completed');
   if (hasErrors) {
     log.push('but received errors');
   } else {
@@ -43,19 +41,15 @@ const logResult = ({
 
   if (hasErrors) {
     console.warn(str, JSON.stringify(errors, null, 2));
-  } else if (isLogging) {
-    console.info(str);
   }
 };
 async function uploadValidatorsAndIndexes({
   collections,
   db,
-  isLogging,
   uri,
 }: {
   collections: MtgCollection[];
   db: string;
-  isLogging: boolean;
   uri: string;
 }): Promise<void> {
   try {
@@ -70,46 +64,48 @@ async function uploadValidatorsAndIndexes({
     let hasErrors = false;
     let hasValidator = false;
     let hasIndexes = false;
-    const runCommandPromises = collections.map(async (c) => {
-      if (c.isGenerated) {
-        if (isLogging) {
-          console.warn(`🟡 ${pkg.name} skipping ${c.name} because it is generated`);
+    const promises = collections
+      .map(async (c) => {
+        if (c.isGenerated) {
+          console.warn(`🟡 ${pkg.name} upload is skipping ${c.name} because it is generated`);
+          return undefined;
         }
-        return undefined;
-      }
 
-      if (c.validator) {
-        hasValidator = true;
-        const handleE = (e: unknown) => {
-          errors[c.name]['validator'].push(e);
-          hasErrors = true;
-        };
-        const collMod = c.name;
-        const isExisting = mongoCollectionNames.includes(c.name);
+        if (c.validator) {
+          hasValidator = true;
+          const handleE = (e: unknown) => {
+            errors[c.name]['validator'].push(e);
+            hasErrors = true;
+          };
+          const collMod = c.name;
+          const isExisting = mongoCollectionNames.includes(c.name);
 
-        if (isExisting) {
-          await mongoDb.command({ collMod, validator: c.validator }).catch(handleE);
-        } else {
-          await mongoDb.createCollection(c.name, { validator: c.validator }).catch(handleE);
+          if (isExisting) {
+            await mongoDb.command({ collMod, validator: c.validator }).catch(handleE);
+          } else {
+            await mongoDb.createCollection(c.name, { validator: c.validator }).catch(handleE);
+          }
         }
-      }
 
-      if (c.indexes && c.indexes.length) {
-        hasIndexes = true;
-        const handleE = (e: unknown) => {
-          errors[c.name]['indexes'].push(e);
-          hasErrors = true;
-        };
-        const col = mongoDb.collection(c.name);
-        await col.createIndexes(c.indexes).catch(handleE);
-      }
-    });
+        if (c.indexes && c.indexes.length) {
+          hasIndexes = true;
+          const handleE = (e: unknown) => {
+            errors[c.name]['indexes'].push(e);
+            hasErrors = true;
+          };
+          const col = mongoDb.collection(c.name);
+          await col.createIndexes(c.indexes).catch(handleE);
+        }
+        return true;
+      })
+      .filter(Boolean);
 
-    await Promise.all(runCommandPromises);
-
-    logResult({ errors, hasErrors, hasIndexes, hasValidator, isLogging });
+    if (promises.length) {
+      await Promise.all(promises);
+    }
+    logResult({ errors, hasErrors, hasIndexes, hasValidator });
   } catch (e) {
-    const error = e instanceof Error ? e.message : e;
+    const error = e instanceof Error ? JSON.stringify(e, Object.getOwnPropertyNames(e)) : JSON.stringify(e);
     console.error(`❌ ${pkg.name} failed to download validators from Mongo: `, error);
   } finally {
     await client.close();

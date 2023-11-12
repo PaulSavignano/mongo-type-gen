@@ -7,6 +7,13 @@ export enum CollectionEnum {
   users = 'users',
 }
 
+export type StudentDoc = {
+  gpa?: number;
+  name: string;
+  test4?: string;
+  year: number;
+};
+
 export type UserDocAddressChildren = {
   _id: ObjectId | string;
   age: number | null;
@@ -53,10 +60,5 @@ export type UserDoc = {
   gender?: UserDocGenderEnum;
   name: string;
   roles?: string[];
-};
-
-export type StudentDoc = {
-  gpa?: number;
-  name: string;
-  year: number;
+  testObj?: Record<string, unknown>;
 };

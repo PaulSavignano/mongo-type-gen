@@ -4,9 +4,18 @@ import { gql } from 'graphql-tag';
 
 export default gql`
 
+  scalar JSONObject
+
   enum CollectionEnum {
     students
     users
+  }
+
+  type StudentDoc {
+    gpa: Float
+    name: String!
+    test4: String
+    year: Int!
   }
 
   type UserDocAddressChildren {
@@ -55,12 +64,7 @@ export default gql`
     gender: UserDocGenderEnum
     name: String!
     roles: [String]
-  }
-
-  type StudentDoc {
-    gpa: Float
-    name: String!
-    year: Int!
+    testObj: JSONObject
   }
 
 `;

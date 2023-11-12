@@ -20,9 +20,8 @@ async function writeCollectionFiles({
         await writeFile({ data: tsCode, dir, file: `${c.name}.collection.ts` });
       }),
     );
-    console.info(`✅ ${pkg.name} collections downloaded from Mongo!`);
   } catch (e) {
-    const error = e instanceof Error ? e.message : e;
+    const error = e instanceof Error ? JSON.stringify(e, Object.getOwnPropertyNames(e)) : JSON.stringify(e);
     console.error(`❌ ${pkg.name} failed to download validators from Mongo: `, error);
   }
 }

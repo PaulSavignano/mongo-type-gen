@@ -4,24 +4,24 @@ export default {
   indexes: [
     {
       key: {
-        _id: 1
-      }
+        _id: 1,
+      },
     },
     {
       key: {
-        name: 1
+        name: 1,
       },
-      unique: true
-    }
+      unique: true,
+    },
   ],
-  isGenerated: true,
+  isGenerated: false,
   name: 'users',
   validator: {
     $jsonSchema: {
       bsonType: 'object',
       properties: {
         _id: {
-          bsonType: 'objectId'
+          bsonType: 'objectId',
         },
         address: {
           additionalProperties: false,
@@ -33,57 +33,41 @@ export default {
                 bsonType: 'object',
                 properties: {
                   _id: {
-                    bsonType: 'objectId'
+                    bsonType: 'objectId',
                   },
                   age: {
-                    bsonType: [
-                      'int',
-                      'null'
-                    ]
+                    bsonType: ['int', 'null'],
                   },
                   createdAt: {
-                    bsonType: 'date'
+                    bsonType: 'date',
                   },
                   name: {
-                    bsonType: 'string'
+                    bsonType: 'string',
                   },
                   updatedAt: {
-                    bsonType: 'date'
-                  }
+                    bsonType: 'date',
+                  },
                 },
-                required: [
-                  '_id',
-                  'age',
-                  'createdAt',
-                  'name'
-                ]
-              }
+                required: ['_id', 'age', 'createdAt', 'name'],
+              },
             },
             city: {
-              bsonType: 'string'
+              bsonType: 'string',
             },
             state: {
-              bsonType: 'string'
+              bsonType: 'string',
             },
             street: {
-              bsonType: 'string'
+              bsonType: 'string',
             },
             zip: {
-              bsonType: 'string'
-            }
+              bsonType: 'string',
+            },
           },
-          required: [
-            'state',
-            'street',
-            'city',
-            'zip'
-          ]
+          required: ['state', 'street', 'city', 'zip'],
         },
         age: {
-          bsonType: [
-            'int',
-            'null'
-          ]
+          bsonType: ['int', 'null'],
         },
         children: {
           bsonType: 'array',
@@ -91,19 +75,16 @@ export default {
             bsonType: 'object',
             properties: {
               _id: {
-                bsonType: 'objectId'
+                bsonType: 'objectId',
               },
               age: {
-                bsonType: [
-                  'int',
-                  'null'
-                ]
+                bsonType: ['int', 'null'],
               },
               createdAt: {
-                bsonType: 'date'
+                bsonType: 'date',
               },
               name: {
-                bsonType: 'string'
+                bsonType: 'string',
               },
               siblings: {
                 bsonType: 'array',
@@ -111,67 +92,49 @@ export default {
                   bsonType: 'object',
                   properties: {
                     _id: {
-                      bsonType: 'objectId'
+                      bsonType: 'objectId',
                     },
                     age: {
-                      bsonType: [
-                        'int',
-                        'null'
-                      ]
+                      bsonType: ['int', 'null'],
                     },
                     createdAt: {
-                      bsonType: 'date'
+                      bsonType: 'date',
                     },
                     name: {
-                      bsonType: 'string'
+                      bsonType: 'string',
                     },
                     updatedAt: {
-                      bsonType: 'date'
-                    }
+                      bsonType: 'date',
+                    },
                   },
-                  required: [
-                    '_id',
-                    'age',
-                    'createdAt',
-                    'name'
-                  ]
-                }
-              }
+                  required: ['_id', 'age', 'createdAt', 'name'],
+                },
+              },
             },
-            required: [
-              '_id',
-              'age',
-              'createdAt',
-              'name'
-            ]
-          }
+            required: ['_id', 'age', 'createdAt', 'name'],
+          },
         },
         gender: {
-          enum: [
-            'MALE',
-            'FEMALE',
-            'UNKNOWN'
-          ]
+          enum: ['MALE', 'FEMALE', 'UNKNOWN'],
         },
         name: {
-          bsonType: 'string'
+          bsonType: 'string',
         },
         roles: {
           bsonType: 'array',
           description: 'must be an array and is required',
           items: {
-            bsonType: 'string'
+            bsonType: 'string',
           },
           maxItems: 25,
-          minItems: 1
-        }
+          minItems: 1,
+        },
+        testObj: {
+          bsonType: 'object',
+        },
       },
-      required: [
-        '_id',
-        'name',
-        'address'
-      ],
-      title: 'UserDoc'
-    }
-  }
+      required: ['_id', 'name', 'address'],
+      title: 'UserDoc',
+    },
+  },
 };
