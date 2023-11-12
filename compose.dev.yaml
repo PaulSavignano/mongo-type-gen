@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   mongo1:
-    command: ['--replSet', 'rs0', '--bind_ip_all']
+    command: [--bind_ip_all, --replSet, rs0]
     healthcheck:
       test: test $$(echo "rs.initiate({_id:'rs0',members:[{_id:0,host:'mongo1:27017'}]}).ok || rs.status().ok" | mongo --quiet) -eq 1
       interval: 10s
@@ -10,5 +10,5 @@ services:
     ports:
       - 27017:27017
     volumes:
-      - ./docker-compose-volumes/mongo1/data:/data/db
       - ./docker-compose-volumes/mongo-dump:/dump
+      - ./docker-compose-volumes/mongo1/data:/data/db

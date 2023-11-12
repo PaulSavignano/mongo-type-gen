@@ -45,7 +45,7 @@
     "node": "20.9.0"
   },
   "files": [
-    "bin",
+    "scr",
     "LICENSE",
     "tsconfig.json"
   ],
