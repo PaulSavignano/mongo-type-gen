@@ -3,20 +3,10 @@
 Define types once, reuse them everywhere!
 </div>
 <br/>
-<table align="center" border="0">
-	<tr>
-		<td align="center" border="0">
-			<img 
-				alt="prod"
-				src="https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg"
-			/>
-		</td>
-	</tr>
-</table>
 
 <div align="center" dir="auto">
 
-[![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yml)
+[![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml)
 [![NPM Version](https://img.shields.io/npm/v/mongo-type-gen.svg?style=flat)](https://www.npmjs.com/package/mongo-type-gen)
 [![NPM Downloads](https://img.shields.io/npm/dm/mongo-type-gen.svg?style=flat)](https://npmcharts.com/compare/mongo-type-gen?minimal=true)
 [![BundleSize](https://img.shields.io/bundlephobia/minzip/mongo-type-gen.svg)](https://bundlephobia.com/result?p=mongo-type-gen)
@@ -31,7 +21,7 @@ Define types once, reuse them everywhere!
 
 Takes a collection definition, ie `**.collection.ts`;
 
-```js
+```ts
 export default {
   indexes: [
     {

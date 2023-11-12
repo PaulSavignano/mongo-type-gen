@@ -14,14 +14,12 @@
   },
   "dependencies": {
     "fast-glob": "^3.3.1",
-    "graphql-tag": "^2.0.0",
-    "json-schema": "^0.4.0",
-    "mongodb": "^5.0.0",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.0.0"
+    "json-schema": "^0.4.0"
   },
   "description": "A type and sdl generator for MongoDB jsonSchema",
   "devDependencies": {
+    "@commitlint/cli": "^18.4.0",
+    "@commitlint/config-conventional": "^18.4.0",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
     "env-cmd": "^10.1.0",
@@ -36,6 +34,8 @@
     "eslint-plugin-sort-keys-fix": "^1.1.2",
     "eslint-plugin-typescript-sort-keys": "^3.1.0",
     "eslint-plugin-yml": "^1.10.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.1.0",
     "prettier": "^3.0.3"
   },
   "directories": {
@@ -57,11 +57,17 @@
     "Types"
   ],
   "license": "ISC",
+  "lint-staged": {
+    "*.ts": "tsc --project . --noEmit",
+    "*.{css,js,jsx,ts,tsx,json,mjs,htm,html,yml,yaml}": "prettier --write",
+    "*.{ts,tsx,js,json,jsx,mjs}": "eslint --cache --fix"
+  },
   "main": "bin/genTypes.ts",
   "name": "mongo-type-gen",
   "peerDependencies": {
     "graphql-tag": "^2.0.0",
     "mongodb": "^5.0.0",
+    "ts-node": "^10.9.1",
     "typescript": "^5.0.0"
   },
   "repository": {
@@ -80,6 +86,7 @@
     "genTypes:build": "node ./bin/genTypes.js",
     "genTypes:build:watch": "node ./bin/genTypes.js -w",
     "genTypes:watch": "ts-node ./src/genTypes.ts -w -sdls",
+    "husky:install": "husky install",
     "lint": "eslint . --ext .ts,.tsx,.js,.json,.jsx,.yaml,.yml",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.json,.jsx,.yaml,.yml --fix",
     "test": "echo \"Error: no test specified\" && exit 1",
