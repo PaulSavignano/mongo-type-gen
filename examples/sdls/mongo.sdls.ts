@@ -14,7 +14,7 @@ export default gql`
   type StudentDoc {
     gpa: Float
     name: String!
-    test4: String
+    test7: String
     year: Int!
   }
 

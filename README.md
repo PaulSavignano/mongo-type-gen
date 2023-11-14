@@ -3,7 +3,7 @@
 Define types once, reuse them everywhere!
 </div>
 <br/>
-
+<br/>
 <div align="center" dir="auto">
 
 [![release](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml/badge.svg)](https://github.com/PaulSavignano/mongo-type-gen/actions/workflows/release.yaml)
@@ -19,10 +19,10 @@ Define types once, reuse them everywhere!
 - **Simple:** Short `mtg` command allows for easy generating, uploading, and downloading of types.
 - **Performant:** Lightweight with very few deps and a small bundle size.
 
-Takes a collection definition, ie `**.collection.ts`;
+Takes a collection definition, ie `**.collection.js`;
 
-```ts
-export default {
+```js
+module.exports {
   indexes: [
     {
       key: { name: 1 },
@@ -122,37 +122,35 @@ Then create some ease-of-use scripts in your package.json.
 ```json
 {
   "scripts": {
-    "gen:types": "mtg", // Root command, generate typescript and sdls from your **.collection.ts files
-    "gen:types:watch": "mtg -w", // watch for file changes and re-generate types
-    "download:collections": "mtg-download-collections", // download your validators and indexes from Mongo
-    "upload:collections": "mtg-upload-collections", // upload your validators and indexes to Mongo
-    "start": "npm run gen:types:watch & ts-node-dev ./src/index.ts" // start mtg in watch mode with your app
+    "start": "mtg -w & ts-node-dev ./src/index.ts"
   }
 }
 ```
 
-With mongo-type-gen, you'll need Mongo JSONSchema flavor validators. You can either define these in the project and ref them in a `mtg.config.js` config file or have `mtg` download them from mongo with `mtg-download-validators`.
+With mongo-type-gen, you'll need Mongo JSONSchema flavor validators. You can either define these in the project and ref them in a `mtg.config.ts` config file or have `mtg` download them from mongo.
 
 To see this in action, create a `mtg.config.js` config file.
 
-```js
-module.exports = {
-  db: 'mongo-type-gen', // Source Mongo database
-  input: '**/*.collection.*s', // glob pattern for your validator files so mtg knows how to find them
+```ts
+import configMtg from 'mongo-type-gen';
+
+export default configMtg({
+  db: 'mongo-type-gen', // name of your db, required
+  input: '**/*.collection.*s', // glob pattern of your collection files, if not present mtg will fetch your collection from Mongo
   output: {
-    collections: 'src/collections',
-    sdls: 'src/sdls'
-    types: 'src/types', // output directory where mtg should place your generated types
-  }
-  uri: 'mongodb://localhost:27017', // MongoDB uri endpoint
-};
+    collections: 'examples/collections', // output directory to place your collection files if mtg fetches them from Mongo
+    sdls: 'examples/sdls', // output dir to place your typescript types
+    types: 'examples/types', // output dir to place your SDLs
+  },
+  uri: 'mongodb://localhost:27017',
+});
 ```
 
-This let's `mtg` learn where it should download or upload your validators. These validators are used to generate your data's Typescript types and GraphQL SDLs.
+This let's `mtg` learn where it should download or upload your collections and where it should place your types.
 
-There is also have a watcher in play to catch any changes you make to your collection's validator or indexes so your types and Mongo remain up to date.
+There is also a watcher available by passing `-w` so any changes you make to your collection's is reflected in your types and Mongo.
 
-When downloading your collection's validator and indexes from Mongo, `mtg` will add an `isGenerated` bool to the data. This lets `mtg` keep track of how to manage your collection data. If the bool is true, `mtg` will not upload your data to Mongo as it is expecting Mongo to be the source of truth. This is useful for apps that need Mongo's types but are not responsibile to setting validators and indexes. You can switch the role by simiply removing the `isGenerated` flag from the data.
+When downloading your collection's from Mongo, `mtg` will add an `isGenerated` boolean field to the data. This lets `mtg` know how to manage your collection data. If the bool is true, `mtg` will not upload your data to Mongo as it is expecting Mongo to be the source of truth. This is useful for apps that need Mongo's types but are not responsibile to setting validators and indexes. You can switch the role by simiply removing the `isGenerated` flag from the data.
 
 ## Validators
 

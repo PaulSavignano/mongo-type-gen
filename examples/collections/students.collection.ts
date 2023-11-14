@@ -33,7 +33,7 @@ export default {
           bsonType: 'string',
           description: "'name' must be a string and is required",
         },
-        test4: {
+        test7: {
           bsonType: 'string',
           description: "'test' must be a string if field exists",
         },

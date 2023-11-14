@@ -17,7 +17,7 @@ async function writeCollectionFiles({
       collections.map(async (c) => {
         const str = formatJsonString(c);
         const tsCode = [banner, `export default ${str};`].join('\n\n');
-        await writeFile({ data: tsCode, dir, file: `${c.name}.collection.ts` });
+        await writeFile({ data: tsCode, dir, file: `${c.name}.collection.js` });
       }),
     );
   } catch (e) {

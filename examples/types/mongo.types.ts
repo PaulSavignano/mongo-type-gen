@@ -10,7 +10,7 @@ export enum CollectionEnum {
 export type StudentDoc = {
   gpa?: number;
   name: string;
-  test4?: string;
+  test7?: string;
   year: number;
 };
 

@@ -1,18 +1,13 @@
 {
   "author": "paul@savignano.io",
   "bin": {
-    "mtg": "ts-node src/genTypes.ts",
-    "mtg-down": "ts-node src/downloadCollections.ts",
-    "mtg-download-collections": "ts-node src/downloadCollections.ts",
-    "mtg-gen": "ts-node src/genTypes.ts",
-    "mtg-gen-types": "ts-node src/genTypes.ts",
-    "mtg-up": "ts-node src/uploadCollections.ts",
-    "mtg-upload-collections": "ts-node src/uploadCollections.ts"
+    "mtg": "dist/cli.js"
   },
   "bugs": {
     "url": "https://github.com/PaulSavignano/mongo-type-gen/issues"
   },
   "dependencies": {
+    "bundle-require": "^4.0.2",
     "fast-glob": "^3.3.1",
     "json-schema": "^0.4.0"
   },
@@ -36,7 +31,8 @@
     "eslint-plugin-yml": "^1.10.0",
     "husky": "^8.0.3",
     "lint-staged": "^15.1.0",
-    "prettier": "^3.0.3"
+    "prettier": "^3.0.3",
+    "tsup": "^7.2.0"
   },
   "directories": {
     "lib": "src"
@@ -45,9 +41,8 @@
     "node": "20.9.0"
   },
   "files": [
-    "scr",
-    "LICENSE",
-    "tsconfig.json"
+    "dist",
+    "LICENSE"
   ],
   "homepage": "https://github.com/PaulSavignano/mongo-type-gen#readme",
   "keywords": [
@@ -58,11 +53,10 @@
   ],
   "license": "ISC",
   "lint-staged": {
-    "*.ts": "tsc --project . --noEmit",
     "*.{css,js,jsx,ts,tsx,json,mjs,htm,html,yml,yaml}": "prettier --write",
     "*.{ts,tsx,js,json,jsx,mjs}": "eslint --cache --fix"
   },
-  "main": "bin/genTypes.ts",
+  "main": "dist/index.js",
   "name": "mongo-type-gen",
   "peerDependencies": {
     "graphql-tag": "^2.0.0",
@@ -75,23 +69,23 @@
     "url": "https://github.com/PaulSavignano/mongo-type-gen.git"
   },
   "scripts": {
-    "build": "rm -rf bin && node esbuild.mjs",
+    "build": "rm -rf bin && tsup",
     "checks:ci": "npm run format && npm run lint && npm run typecheck && npm run build",
+    "checks:husky": "npm run typecheck && npm run build",
     "docker:down": "docker compose -f compose.dev.yaml down --remove-orphans",
     "docker:up": "docker compose -f compose.dev.yaml up -d",
-    "downloadCollections": "ts-node ./src/downloadCollections.ts",
     "format": "prettier --list-different '**/*.{css,js,jsx,ts,tsx,json,htm,html,yml,yaml}'",
     "format:fix": "prettier --write '**/*.{css,js,jsx,ts,tsx,json,htm,html,yml,yaml}'",
-    "genTypes": "ts-node ./src/genTypes.ts -sdls",
-    "genTypes:build": "node ./bin/genTypes.js",
-    "genTypes:build:watch": "node ./bin/genTypes.js -w",
-    "genTypes:watch": "ts-node ./src/genTypes.ts -w -sdls",
     "husky:install": "husky install",
     "lint": "eslint . --ext .ts,.tsx,.js,.json,.jsx,.yaml,.yml",
     "lint:fix": "eslint . --ext .ts,.tsx,.js,.json,.jsx,.yaml,.yml --fix",
+    "start:build:cli": "ts-node ./dist/cli.js",
+    "start:build:cli:w": "ts-node ./dist/cli.js -w",
+    "start:cli": "ts-node ./src/cli.ts",
+    "start:cli:w": "ts-node ./src/cli.ts -w",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "typecheck": "tsc --project . --noEmit",
-    "uploadCollections": "ts-node ./src/uploadCollections.ts"
+    "typecheck": "tsc --project . --noEmit"
   },
+  "types": "dist/index.d.ts",
   "version": "0.0.0"
 }

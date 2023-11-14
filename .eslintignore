@@ -7,3 +7,5 @@ dist
 docker-compose-volumes
 node_modules
 package-lock.json
+examples/sdls
+examples/types

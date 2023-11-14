@@ -5,5 +5,5 @@ bin
 docker-compose-volumes
 node_modules
 package-lock.json
-examples/**.types.**
-examples/**.sdls.**
+examples/sdls
+examples/types
